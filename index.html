@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Sliding Block Puzzle (4x4)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Prompt:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FAF5EE;
+      --bg-gradient: radial-gradient(circle at 50% 15%, #FFFDF9 0%, #FAF5EE 100%);
+      --chassis-grad: linear-gradient(145deg, #FDF4DE, #F3E2BD);
+      --chassis-border: #FFF8E8;
+      --chassis-shadow: rgba(160, 115, 65, 0.2);
+      --tray: #EFE7D8;
+      --tray-shadow: rgba(120, 90, 50, 0.18);
+      --tile-top: #FFAA7E;
+      --tile-bot: #F27B48;
+      --tile-border: #FFBFA0;
+      --tile-shadow: rgba(190, 75, 25, 0.28);
+      --card-bg: #FFFFFF;
+      --card-border: #F1E5CF;
+      --badge-bg: rgba(255, 255, 255, 0.6);
+      --badge-text: #966734;
+      --text: #4A3A2A;
+      --muted: #8C7B6B;
+      --btn-reset-bg: #FFFFFF;
+      --btn-reset-border: #E4D5BC;
+    }
+
+    [data-theme="dark"] {
+      --bg: #141210;
+      --bg-gradient: radial-gradient(circle at 50% 15%, #24201B 0%, #141210 100%);
+      --chassis-grad: linear-gradient(145deg, #2D2720, #221D17);
+      --chassis-border: #3D352B;
+      --chassis-shadow: rgba(0, 0, 0, 0.65);
+      --tray: #171411;
+      --tray-shadow: rgba(0, 0, 0, 0.7);
+      --tile-top: #FF8F54;
+      --tile-bot: #D85520;
+      --tile-border: #FF9F6B;
+      --tile-shadow: rgba(0, 0, 0, 0.5);
+      --card-bg: #211D18;
+      --card-border: #383025;
+      --badge-bg: rgba(255, 255, 255, 0.08);
+      --badge-text: #E5D5C5;
+      --text: #F7EEE5;
+      --muted: #A89B8B;
+      --btn-reset-bg: #211D18;
+      --btn-reset-border: #383025;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      font-family: 'Prompt', 'Fredoka', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      color: var(--text);
+    }
+
+    .game-container {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Header */
+    .brand-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 4px;
+    }
+
+    .brand-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .deli-pill {
+      background: #E83A30;
+      color: white;
+      font-family: 'Fredoka', cursive;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 12px;
+      box-shadow: 0 3px 6px rgba(232, 58, 48, 0.25);
+    }
+
+    .deli-pill span {
+      background: #0FB5BA;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 8px;
+    }
+
+    .brand-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.5px;
+    }
+
+    /* Dark/Light Switch */
+    .theme-switch {
+      background: #EAE1D1;
+      border: 2px solid #DACAB3;
+      border-radius: 20px;
+      width: 52px;
+      height: 28px;
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 2px;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
+      outline: none;
+    }
+
+    .switch-handle {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+      transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.25, 1), background-color 0.25s ease;
+      font-size: 12px;
+    }
+
+    [data-theme="dark"] .theme-switch {
+      background: #383229;
+      border-color: #4F4537;
+    }
+
+    [data-theme="dark"] .switch-handle {
+      transform: translateX(24px);
+      background: #FF9E64;
+    }
+
+    /* HUD Stats */
+    .hud {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .hud-card {
+      background: var(--card-bg);
+      border: 2px solid var(--card-border);
+      border-radius: 16px;
+      padding: 8px 12px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+    }
+
+    .hud-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.8px;
+    }
+
+    .hud-val {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    /* Board Chassis */
+    .chassis {
+      background: var(--chassis-grad);
+      border: 8px solid var(--chassis-border);
+      border-radius: 32px;
+      padding: 14px;
+      box-shadow: 0 16px 32px var(--chassis-shadow);
+    }
+
+    .chassis-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding: 0 4px;
+    }
+
+    .mini-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--badge-text);
+      background: var(--badge-bg);
+      padding: 3px 9px;
+      border-radius: 12px;
+    }
+
+    /* 4x4 Grid Tray */
+    .tray {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: var(--tray);
+      border-radius: 20px;
+      box-shadow: inset 0 5px 12px var(--tray-shadow);
+      position: relative;
+      touch-action: none;
+    }
+
+    /* 4x4 Tiles */
+    .tile {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 25%;
+      height: 25%;
+      padding: 3px;
+      cursor: pointer;
+      will-change: transform;
+      transition: transform 0.16s cubic-bezier(0.2, 0.8, 0.25, 1);
+    }
+
+    .tile-inner {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(145deg, var(--tile-top), var(--tile-bot));
+      border-radius: 14px;
+      border: 2px solid var(--tile-border);
+      box-shadow: 0 4px 8px var(--tile-shadow), inset 0 2px 3px rgba(255, 255, 255, 0.5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      transition: transform 0.08s ease;
+    }
+
+    .tile:active .tile-inner {
+      transform: scale(0.96);
+    }
+
+    .tile-num {
+      font-family: 'Fredoka', cursive;
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1;
+      text-shadow: 0 1px 2px rgba(120, 40, 10, 0.3);
+    }
+
+    .tile-word {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 9px;
+      font-weight: 500;
+      color: #FFE6DA;
+      margin-top: 2px;
+      line-height: 1;
+    }
+
+    /* Action Buttons */
+    .actions {
+      display: flex;
+      width: 100%;
+    }
+
+    .btn {
+      font-family: 'Prompt', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 12px;
+      border-radius: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform 0.1s ease;
+      width: 100%;
+    }
+
+    .btn:active {
+      transform: translateY(2px);
+    }
+
+    .btn-shuffle {
+      background: linear-gradient(145deg, #FF8E5E, #F26733);
+      color: white;
+      border: none;
+      box-shadow: 0 6px 14px rgba(242, 103, 51, 0.35);
+    }
+
+    /* Win Modal */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 10, 5, 0.65);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      z-index: 100;
+    }
+
+    .modal.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      background: var(--card-bg);
+      border: 4px solid var(--chassis-border);
+      border-radius: 26px;
+      padding: 26px;
+      width: 100%;
+      max-width: 320px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-trophy {
+      font-size: 48px;
+      margin-bottom: 6px;
+    }
+
+    .modal-title {
+      font-family: 'Fredoka', cursive;
+      font-size: 24px;
+      margin-bottom: 2px;
+      color: var(--text);
+    }
+
+    .modal-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .modal-stats {
+      background: var(--tray);
+      border-radius: 14px;
+      padding: 10px;
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 18px;
+    }
+
+    .modal-stat-val {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: #E85B28;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-container">
+    <!-- Brand Header พร้อมปุ่มสลับ Dark/Light Mode -->
+    <header class="brand-header">
+      <div class="brand-left">
+        <div class="deli-pill">deli <span>Genius</span></div>
+        <span class="brand-title">SLIDING PUZZLE</span>
+      </div>
+      <button id="themeToggle" class="theme-switch" aria-label="Toggle theme" title="สลับโหมด Dark / Light">
+        <div class="switch-handle">
+          <span id="switchIcon">☀️</span>
+        </div>
+      </button>
+    </header>
+
+    <!-- Stats HUD -->
+    <section class="hud">
+      <div class="hud-card">
+        <div class="hud-label">TIME</div>
+        <div id="timeDisplay" class="hud-val">00:00</div>
+      </div>
+      <div class="hud-card">
+        <div class="hud-label">MOVES</div>
+        <div id="movesDisplay" class="hud-val">0</div>
+      </div>
+    </section>
+
+    <!-- 4x4 Board Chassis -->
+    <main class="chassis">
+      <div class="chassis-top">
+        <div class="deli-pill" style="font-size: 11px; padding: 2px 7px;">deli <span>Genius</span></div>
+        <div class="mini-badge">🧲 แม่เหล็กเคลื่อนคล่อง (4×4)</div>
+      </div>
+      <div id="tray" class="tray"></div>
+    </main>
+
+    <!-- Actions -->
+    <footer class="actions">
+      <button id="shuffleBtn" class="btn btn-shuffle">🎲 สุ่มกระดานใหม่</button>
+    </footer>
+  </div>
+
+  <!-- Win Modal -->
+  <div id="winModal" class="modal">
+    <div class="modal-box">
+      <div class="modal-trophy">🏆</div>
+      <h2 class="modal-title">สุดยอดมาก!</h2>
+      <p class="modal-sub">คุณเรียงตัวเลข 1-15 สำเร็จแล้ว</p>
+      <div class="modal-stats">
+        <div>
+          <div class="hud-label">เวลาที่ใช้</div>
+          <div id="finalTime" class="modal-stat-val">00:00</div>
+        </div>
+        <div>
+          <div class="hud-label">จำนวนก้าว</div>
+          <div id="finalMoves" class="modal-stat-val">0</div>
+        </div>
+      </div>
+      <button id="playAgainBtn" class="btn btn-shuffle" style="width: 100%;">🎮 เล่นอีกรอบ</button>
+    </div>
+  </div>
+
+  <script>
+    const WORDS = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen'];
+    const SIZE = 4;
+    const TOTAL = 16;
+
+    let board = [];
+    let emptyIdx = 15;
+    let moves = 0;
+    let seconds = 0;
+    let timerId = null;
+    let isStarted = false;
+    let isWon = false;
+    let isShuffling = false;
+
+    const tray = document.getElementById('tray');
+    const timeEl = document.getElementById('timeDisplay');
+    const movesEl = document.getElementById('movesDisplay');
+    const winModal = document.getElementById('winModal');
+    const finalTimeEl = document.getElementById('finalTime');
+    const finalMovesEl = document.getElementById('finalMoves');
+    const tileEls = new Map();
+
+    // ระบบสลับโหมด Dark / Light
+    const themeToggle = document.getElementById('themeToggle');
+    const switchIcon = document.getElementById('switchIcon');
+
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      switchIcon.textContent = theme === 'dark' ? '🌙' : '☀️';
+      localStorage.setItem('puzzle_theme', theme);
+    }
+
+    const savedTheme = localStorage.getItem('puzzle_theme') || 'light';
+    setTheme(savedTheme);
+
+    themeToggle.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme');
+      setTheme(current === 'dark' ? 'light' : 'dark');
+    });
+
+    // สร้าง DOM บล็อก 1-15 ครั้งเดียว
+    function createTiles() {
+      tray.innerHTML = '';
+      tileEls.clear();
+      for (let num = 1; num < TOTAL; num++) {
+        const el = document.createElement('div');
+        el.className = 'tile';
+        el.innerHTML = `
+          <div class="tile-inner">
+            <span class="tile-num">${num}</span>
+            <span class="tile-word">${WORDS[num]}</span>
+          </div>`;
+        el.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          moveTile(num);
+        });
+        tray.appendChild(el);
+        tileEls.set(num, el);
+      }
+    }
+
+    // อัปเดตตำแหน่ง CSS Transform
+    function render() {
+      for (let idx = 0; idx < TOTAL; idx++) {
+        const num = board[idx];
+        if (num === 0) continue;
+        const row = Math.floor(idx / SIZE);
+        const col = idx % SIZE;
+        tileEls.get(num).style.transform = `translate3d(${col * 100}%, ${row * 100}%, 0)`;
+      }
+    }
+
+    // เลื่อนตัวเลข (รองรับเลื่อนทั้งแถว/คอลัมน์)
+    function moveTile(num) {
+      if (isWon || isShuffling) return;
+      const clickedIdx = board.indexOf(num);
+      const cRow = Math.floor(clickedIdx / SIZE), cCol = clickedIdx % SIZE;
+      const eRow = Math.floor(emptyIdx / SIZE), eCol = emptyIdx % SIZE;
+
+      let moved = false;
+      if (cCol === eCol) { // แถวแนวตั้งเดียวกัน
+        const step = cRow < eRow ? 1 : -1;
+        for (let r = eRow; r !== cRow; r -= step) {
+          board[r * SIZE + cCol] = board[(r - step) * SIZE + cCol];
+        }
+        moved = true;
+      } else if (cRow === eRow) { // แถวแนวนอนเดียวกัน
+        const step = cCol < eCol ? 1 : -1;
+        for (let c = eCol; c !== cCol; c -= step) {
+          board[cRow * SIZE + c] = board[cRow * SIZE + (c - step)];
+        }
+        moved = true;
+      }
+
+      if (moved) {
+        board[clickedIdx] = 0;
+        emptyIdx = clickedIdx;
+        render();
+        if (!isStarted) startTimer();
+        moves++;
+        movesEl.textContent = moves;
+        checkWin();
+      }
+    }
+
+    // สุ่มกระดานแบบรับประกันว่าแก้ได้ 100% (Random Walk 180 ก้าว)
+    function shuffle() {
+      if (isShuffling) return;
+      isShuffling = true;
+      resetGame();
+
+      tileEls.forEach(el => el.style.transition = 'none');
+
+      let lastEmpty = -1;
+      for (let i = 0; i < 180; i++) {
+        const row = Math.floor(emptyIdx / SIZE), col = emptyIdx % SIZE;
+        const neighbors = [];
+        if (row > 0) neighbors.push((row - 1) * SIZE + col);
+        if (row < SIZE - 1) neighbors.push((row + 1) * SIZE + col);
+        if (col > 0) neighbors.push(row * SIZE + (col - 1));
+        if (col < SIZE - 1) neighbors.push(row * SIZE + (col + 1));
+
+        const valid = neighbors.filter(idx => idx !== lastEmpty);
+        const chosen = valid.length ? valid[Math.floor(Math.random() * valid.length)] : neighbors[0];
+
+        lastEmpty = emptyIdx;
+        board[emptyIdx] = board[chosen];
+        board[chosen] = 0;
+        emptyIdx = chosen;
+      }
+
+      render();
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          tileEls.forEach(el => el.style.transition = '');
+          isShuffling = false;
+        }, 30);
+      });
+    }
+
+    function resetGame() {
+      stopTimer();
+      seconds = 0;
+      moves = 0;
+      isStarted = false;
+      isWon = false;
+      timeEl.textContent = '00:00';
+      movesEl.textContent = '0';
+      winModal.classList.remove('active');
+
+      board = Array.from({ length: TOTAL - 1 }, (_, i) => i + 1);
+      board.push(0);
+      emptyIdx = TOTAL - 1;
+      render();
+    }
+
+    function checkWin() {
+      for (let i = 0; i < TOTAL - 1; i++) {
+        if (board[i] !== i + 1) return;
+      }
+      isWon = true;
+      stopTimer();
+      finalTimeEl.textContent = timeEl.textContent;
+      finalMovesEl.textContent = moves;
+      setTimeout(() => winModal.classList.add('active'), 300);
+    }
+
+    function startTimer() {
+      isStarted = true;
+      clearInterval(timerId);
+      timerId = setInterval(() => {
+        seconds++;
+        const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+        const s = String(seconds % 60).padStart(2, '0');
+        timeEl.textContent = `${m}:${s}`;
+      }, 1000);
+    }
+
+    function stopTimer() {
+      clearInterval(timerId);
+      timerId = null;
+    }
+
+    // Keyboard support
+    window.addEventListener('keydown', (e) => {
+      if (isWon || isShuffling) return;
+      const r = Math.floor(emptyIdx / SIZE), c = emptyIdx % SIZE;
+      let target = -1;
+      if (e.code === 'ArrowUp' && r < SIZE - 1) target = (r + 1) * SIZE + c;
+      if (e.code === 'ArrowDown' && r > 0) target = (r - 1) * SIZE + c;
+      if (e.code === 'ArrowLeft' && c < SIZE - 1) target = r * SIZE + (c + 1);
+      if (e.code === 'ArrowRight' && c > 0) target = r * SIZE + (c - 1);
+      if (target !== -1) moveTile(board[target]);
+    });
+
+    // Event listeners
+    document.getElementById('shuffleBtn').onclick = () => shuffle();
+    document.getElementById('playAgainBtn').onclick = () => shuffle();
+
+    // Start
+    createTiles();
+    shuffle();
+  </script>
+</body>
+</html>
