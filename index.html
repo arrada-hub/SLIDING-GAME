@@ -9,641 +9,131 @@
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #FAF5EE;
-      --bg-gradient: radial-gradient(circle at 50% 15%, #FFFDF9 0%, #FAF5EE 100%);
-      --chassis-grad: linear-gradient(145deg, #FDF4DE, #F3E2BD);
-      --chassis-border: #FFF8E8;
-      --chassis-shadow: rgba(160, 115, 65, 0.2);
+      --bg-grad: radial-gradient(circle at 50% 15%, #FFFDF9 0%, #FAF5EE 100%);
+      --chassis: linear-gradient(145deg, #FDF4DE, #F3E2BD);
+      --border: #FFF8E8;
+      --shadow: rgba(160, 115, 65, 0.2);
       --tray: #EFE7D8;
-      --tray-shadow: rgba(120, 90, 50, 0.18);
-      
-      /* สีบล็อกและตัวเลข (ปรับเปลี่ยนได้ตาม Theme Color) */
+      --card: #FFFFFF;
+      --card-border: #F1E5CF;
+      --text: #4A3A2A;
+      --muted: #8C7B6B;
+      --track: #E4D5BC;
       --tile-top: #FFAA7E;
       --tile-bot: #F27B48;
       --tile-border: #FFBFA0;
       --tile-shadow: rgba(190, 75, 25, 0.28);
       --tile-text: #FFFFFF;
       --tile-subtext: #FFE6DA;
-      
-      --card-bg: #FFFFFF;
-      --card-border: #F1E5CF;
-      --badge-bg: rgba(255, 255, 255, 0.6);
-      --badge-text: #966734;
-      --text: #4A3A2A;
-      --muted: #8C7B6B;
-      --slider-track: #E4D5BC;
     }
-
     [data-theme="dark"] {
-      --bg: #141210;
-      --bg-gradient: radial-gradient(circle at 50% 15%, #24201B 0%, #141210 100%);
-      --chassis-grad: linear-gradient(145deg, #2D2720, #221D17);
-      --chassis-border: #3D352B;
-      --chassis-shadow: rgba(0, 0, 0, 0.65);
+      --bg-grad: radial-gradient(circle at 50% 15%, #24201B 0%, #141210 100%);
+      --chassis: linear-gradient(145deg, #2D2720, #221D17);
+      --border: #3D352B;
+      --shadow: rgba(0, 0, 0, 0.65);
       --tray: #171411;
-      --tray-shadow: rgba(0, 0, 0, 0.7);
-      --card-bg: #211D18;
+      --card: #211D18;
       --card-border: #383025;
-      --badge-bg: rgba(255, 255, 255, 0.08);
-      --badge-text: #E5D5C5;
       --text: #F7EEE5;
       --muted: #A89B8B;
-      --slider-track: #3D352B;
+      --track: #3D352B;
     }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-      -webkit-user-select: none;
-      transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
-    }
-
-    body {
-      background: var(--bg-gradient);
-      font-family: 'Prompt', 'Fredoka', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      color: var(--text);
-    }
-
-    .game-container {
-      width: 100%;
-      max-width: 420px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; transition: background-color 0.25s, border-color 0.25s, color 0.25s; }
+    body { background: var(--bg-grad); font-family: 'Prompt', 'Fredoka', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; color: var(--text); }
+    .game-wrap { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 14px; }
+    
     /* Header */
-    .brand-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 4px;
-    }
+    .header { display: flex; justify-content: space-between; align-items: center; padding: 0 4px; }
+    .brand { display: flex; align-items: center; gap: 8px; }
+    .deli-pill { background: #E83A30; color: white; font-family: 'Fredoka', cursive; font-size: 15px; font-weight: 700; padding: 3px 9px; border-radius: 12px; box-shadow: 0 3px 6px rgba(232,58,48,0.25); }
+    .deli-pill span { background: #0FB5BA; font-size: 10px; padding: 2px 6px; border-radius: 8px; }
+    .brand-title { font-size: 14px; font-weight: 700; color: var(--muted); letter-spacing: 0.5px; }
+    .header-actions { display: flex; align-items: center; gap: 6px; }
 
-    .brand-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    /* Widgets & Buttons */
+    .music-box { display: flex; align-items: center; background: var(--card); border: 2px solid var(--card-border); border-radius: 20px; padding: 2px 6px 2px 3px; gap: 6px; }
+    .icon-btn { background: none; border: none; color: var(--text); width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; }
+    .vol-slider { -webkit-appearance: none; appearance: none; width: 48px; height: 4px; border-radius: 4px; background: var(--track); outline: none; cursor: pointer; }
+    .vol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--tile-bot); cursor: pointer; }
+    .vol-slider::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: var(--tile-bot); cursor: pointer; border: none; }
+    .btn-circle { background: var(--card); border: 2px solid var(--card-border); color: var(--text); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; }
+    .theme-switch { background: #EAE1D1; border: 2px solid #DACAB3; border-radius: 20px; width: 48px; height: 28px; cursor: pointer; position: relative; display: flex; align-items: center; padding: 2px; }
+    .switch-handle { width: 20px; height: 20px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; transition: transform 0.25s; font-size: 11px; }
+    [data-theme="dark"] .theme-switch { background: #383229; border-color: #4F4537; }
+    [data-theme="dark"] .switch-handle { transform: translateX(20px); background: var(--tile-top); }
 
-    .deli-pill {
-      background: #E83A30;
-      color: white;
-      font-family: 'Fredoka', cursive;
-      font-size: 15px;
-      font-weight: 700;
-      padding: 3px 9px;
-      border-radius: 12px;
-      box-shadow: 0 3px 6px rgba(232, 58, 48, 0.25);
-    }
+    /* HUD & Chassis */
+    .hud { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .hud-card { background: var(--card); border: 2px solid var(--card-border); border-radius: 16px; padding: 8px 12px; text-align: center; }
+    .hud-label { font-size: 11px; font-weight: 700; color: var(--muted); }
+    .hud-val { font-family: 'Fredoka', sans-serif; font-size: 20px; font-weight: 700; }
+    .chassis { background: var(--chassis); border: 8px solid var(--border); border-radius: 32px; padding: 14px; box-shadow: 0 16px 32px var(--shadow); }
+    .chassis-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 4px; }
+    .mini-badge { font-size: 11px; font-weight: 700; color: #966734; background: rgba(255,255,255,0.6); padding: 3px 9px; border-radius: 12px; }
+    [data-theme="dark"] .mini-badge { color: #E5D5C5; background: rgba(255,255,255,0.08); }
 
-    .deli-pill span {
-      background: #0FB5BA;
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 8px;
-    }
+    /* Tray & Tiles */
+    .tray { width: 100%; aspect-ratio: 1/1; background: var(--tray); border-radius: 20px; box-shadow: inset 0 5px 12px rgba(0,0,0,0.18); position: relative; touch-action: none; }
+    .tile { position: absolute; width: 25%; height: 25%; padding: 3px; cursor: pointer; will-change: transform; transition: transform 0.16s cubic-bezier(0.2,0.8,0.25,1); }
+    .tile-inner { width: 100%; height: 100%; background: linear-gradient(145deg, var(--tile-top), var(--tile-bot)); border-radius: 14px; border: 2px solid var(--tile-border); box-shadow: 0 4px 8px var(--tile-shadow), inset 0 2px 3px rgba(255,255,255,0.5); display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.08s, background 0.2s; }
+    .tile:active .tile-inner { transform: scale(0.96); }
+    .tile-num { font-family: 'Fredoka', cursive; font-size: 26px; font-weight: 700; color: var(--tile-text); text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+    .tile-word { font-family: 'Fredoka', sans-serif; font-size: 9px; font-weight: 500; color: var(--tile-subtext); margin-top: 2px; }
 
-    .brand-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--muted);
-      letter-spacing: 0.5px;
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    /* Music Control Box */
-    .music-widget {
-      display: flex;
-      align-items: center;
-      background: var(--card-bg);
-      border: 2px solid var(--card-border);
-      border-radius: 20px;
-      padding: 2px 6px 2px 3px;
-      gap: 6px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
-    }
-
-    .icon-btn {
-      background: transparent;
-      border: none;
-      color: var(--text);
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      cursor: pointer;
-      transition: transform 0.1s ease;
-    }
-
-    .icon-btn:active {
-      transform: scale(0.9);
-    }
-
-    /* Volume Slider */
-    .volume-slider {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 48px;
-      height: 4px;
-      border-radius: 4px;
-      background: var(--slider-track);
-      outline: none;
-      cursor: pointer;
-    }
-
-    .volume-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: var(--tile-bot, #F27B48);
-      cursor: pointer;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
-    }
-
-    .volume-slider::-moz-range-thumb {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: var(--tile-bot, #F27B48);
-      cursor: pointer;
-      border: none;
-    }
-
-    /* Single Circle Action Buttons */
-    .btn-circle {
-      background: var(--card-bg);
-      border: 2px solid var(--card-border);
-      color: var(--text);
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      cursor: pointer;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
-      transition: transform 0.1s ease;
-    }
-
-    .btn-circle:active {
-      transform: scale(0.92);
-    }
-
-    /* Dark/Light Switch */
-    .theme-switch {
-      background: #EAE1D1;
-      border: 2px solid #DACAB3;
-      border-radius: 20px;
-      width: 48px;
-      height: 28px;
-      cursor: pointer;
-      position: relative;
-      display: flex;
-      align-items: center;
-      padding: 2px;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
-      outline: none;
-    }
-
-    .switch-handle {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-      transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.25, 1), background-color 0.25s ease;
-      font-size: 11px;
-    }
-
-    [data-theme="dark"] .theme-switch {
-      background: #383229;
-      border-color: #4F4537;
-    }
-
-    [data-theme="dark"] .switch-handle {
-      transform: translateX(20px);
-      background: var(--tile-top, #FF9E64);
-    }
-
-    /* HUD Stats */
-    .hud {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .hud-card {
-      background: var(--card-bg);
-      border: 2px solid var(--card-border);
-      border-radius: 16px;
-      padding: 8px 12px;
-      text-align: center;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
-    }
-
-    .hud-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--muted);
-      letter-spacing: 0.8px;
-    }
-
-    .hud-val {
-      font-family: 'Fredoka', sans-serif;
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    /* Board Chassis */
-    .chassis {
-      background: var(--chassis-grad);
-      border: 8px solid var(--chassis-border);
-      border-radius: 32px;
-      padding: 14px;
-      box-shadow: 0 16px 32px var(--chassis-shadow);
-    }
-
-    .chassis-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      padding: 0 4px;
-    }
-
-    .mini-badge {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--badge-text);
-      background: var(--badge-bg);
-      padding: 3px 9px;
-      border-radius: 12px;
-    }
-
-    /* 4x4 Grid Tray */
-    .tray {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      background: var(--tray);
-      border-radius: 20px;
-      box-shadow: inset 0 5px 12px var(--tray-shadow);
-      position: relative;
-      touch-action: none;
-    }
-
-    /* 4x4 Tiles */
-    .tile {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 25%;
-      height: 25%;
-      padding: 3px;
-      cursor: pointer;
-      will-change: transform;
-      transition: transform 0.16s cubic-bezier(0.2, 0.8, 0.25, 1);
-    }
-
-    .tile-inner {
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(145deg, var(--tile-top), var(--tile-bot));
-      border-radius: 14px;
-      border: 2px solid var(--tile-border);
-      box-shadow: 0 4px 8px var(--tile-shadow), inset 0 2px 3px rgba(255, 255, 255, 0.5);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: var(--tile-text);
-      transition: transform 0.08s ease, background 0.2s ease, border-color 0.2s ease;
-    }
-
-    .tile:active .tile-inner {
-      transform: scale(0.96);
-    }
-
-    .tile-num {
-      font-family: 'Fredoka', cursive;
-      font-size: 26px;
-      font-weight: 700;
-      line-height: 1;
-      color: var(--tile-text);
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-    }
-
-    .tile-word {
-      font-family: 'Fredoka', sans-serif;
-      font-size: 9px;
-      font-weight: 500;
-      color: var(--tile-subtext);
-      margin-top: 2px;
-      line-height: 1;
-    }
-
-    /* Action Buttons */
-    .actions {
-      display: flex;
-      width: 100%;
-    }
-
-    .btn {
-      font-family: 'Prompt', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-      padding: 12px;
-      border-radius: 18px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: transform 0.1s ease;
-      width: 100%;
-    }
-
-    .btn:active {
-      transform: translateY(2px);
-    }
-
-    .btn-shuffle {
-      background: linear-gradient(145deg, var(--tile-top, #FF8E5E), var(--tile-bot, #F26733));
-      color: var(--tile-text, white);
-      border: none;
-      box-shadow: 0 6px 14px var(--tile-shadow, rgba(242, 103, 51, 0.35));
-    }
+    /* Actions */
+    .btn-shuffle { width: 100%; font-family: 'Prompt', sans-serif; font-size: 15px; font-weight: 700; padding: 12px; border-radius: 18px; cursor: pointer; border: none; background: linear-gradient(145deg, var(--tile-top), var(--tile-bot)); color: var(--tile-text); box-shadow: 0 6px 14px var(--tile-shadow); transition: transform 0.1s; }
+    .btn-shuffle:active { transform: translateY(2px); }
 
     /* Modals */
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 10, 5, 0.65);
-      backdrop-filter: blur(4px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s ease;
-      z-index: 100;
-    }
-
-    .modal.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .modal-box {
-      background: var(--card-bg);
-      border: 4px solid var(--chassis-border);
-      border-radius: 26px;
-      padding: 24px 20px;
-      width: 100%;
-      max-width: 340px;
-      text-align: center;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-    }
-
-    .modal-title {
-      font-family: 'Fredoka', cursive;
-      font-size: 24px;
-      margin-bottom: 2px;
-      color: var(--text);
-    }
-
-    .modal-sub {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 14px;
-    }
-
-    /* --------------------------------------------------
-       COLOR CUSTOMIZER MODAL STYLES
-       -------------------------------------------------- */
-    .preview-wrap {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 16px;
-    }
-
-    .preview-tile-card {
-      width: 72px;
-      height: 72px;
-      border-radius: 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      border: 2px solid var(--tile-border);
-      background: linear-gradient(145deg, var(--tile-top), var(--tile-bot));
-      box-shadow: 0 6px 14px var(--tile-shadow);
-      transition: all 0.15s ease;
-    }
-
-    .color-section {
-      text-align: left;
-      margin-bottom: 14px;
-    }
-
-    .color-section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-
-    .color-picker-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .native-color-box {
-      width: 38px;
-      height: 34px;
-      border-radius: 10px;
-      border: 2px solid var(--card-border);
-      overflow: hidden;
-      flex-shrink: 0;
-      cursor: pointer;
-      position: relative;
-    }
-
-    .native-color-input {
-      position: absolute;
-      top: -10px;
-      left: -10px;
-      width: 60px;
-      height: 60px;
-      cursor: pointer;
-      border: none;
-      background: none;
-    }
-
-    .swatches-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      flex: 1;
-    }
-
-    .swatch-btn {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      border: 2px solid white;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-      cursor: pointer;
-      transition: transform 0.1s ease;
-    }
-
-    .swatch-btn:active {
-      transform: scale(0.85);
-    }
-
-    .swatch-btn:hover {
-      transform: scale(1.15);
-    }
-
-    .btn-reset-color {
-      background: transparent;
-      border: none;
-      color: var(--muted);
-      font-family: 'Prompt', sans-serif;
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-      text-decoration: underline;
-      margin-top: 6px;
-      display: inline-block;
-    }
-
-    /* Tutorial Steps */
-    .tutorial-steps {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 20px;
-      text-align: left;
-    }
-
-    .step-card {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      background: var(--tray);
-      padding: 10px 12px;
-      border-radius: 14px;
-    }
-
-    .step-icon {
-      font-size: 20px;
-      line-height: 1.2;
-      flex-shrink: 0;
-    }
-
-    .step-content strong {
-      font-size: 13px;
-      color: var(--text);
-      display: block;
-      margin-bottom: 2px;
-    }
-
-    .step-content p {
-      font-size: 11.5px;
-      color: var(--muted);
-      line-height: 1.35;
-      margin: 0;
-    }
-
-    .modal-stats {
-      background: var(--tray);
-      border-radius: 14px;
-      padding: 10px;
-      display: flex;
-      justify-content: space-around;
-      margin-bottom: 18px;
-    }
-
-    .modal-stat-val {
-      font-family: 'Fredoka', sans-serif;
-      font-size: 17px;
-      font-weight: 700;
-      color: var(--tile-bot, #E85B28);
-    }
+    .modal { position: fixed; inset: 0; background: rgba(15,10,5,0.65); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.25s; z-index: 100; }
+    .modal.active { opacity: 1; pointer-events: auto; }
+    .modal-box { background: var(--card); border: 4px solid var(--border); border-radius: 26px; padding: 24px 20px; width: 100%; max-width: 340px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+    .modal-title { font-family: 'Fredoka', cursive; font-size: 24px; margin-bottom: 2px; }
+    .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+    .step-card { display: flex; gap: 10px; background: var(--tray); padding: 10px 12px; border-radius: 14px; text-align: left; margin-bottom: 10px; }
+    .preview-card { width: 72px; height: 72px; border-radius: 16px; margin: 0 auto 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px solid var(--tile-border); background: linear-gradient(145deg, var(--tile-top), var(--tile-bot)); box-shadow: 0 6px 14px var(--tile-shadow); }
+    .color-section { text-align: left; margin-bottom: 14px; }
+    .color-header { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
+    .color-row { display: flex; align-items: center; gap: 8px; }
+    .color-pick-wrap { width: 38px; height: 34px; border-radius: 10px; border: 2px solid var(--card-border); overflow: hidden; position: relative; flex-shrink: 0; cursor: pointer; }
+    .color-pick-wrap input { position: absolute; top: -10px; left: -10px; width: 60px; height: 60px; cursor: pointer; border: none; background: none; }
+    .swatches { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; }
+    .swatch { width: 24px; height: 24px; border-radius: 50%; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.1s; }
+    .swatch:hover { transform: scale(1.15); }
+    .btn-reset-color { background: none; border: none; color: var(--muted); font-size: 11px; font-weight: 600; cursor: pointer; text-decoration: underline; margin-top: 6px; }
+    .modal-stats { background: var(--tray); border-radius: 14px; padding: 10px; display: flex; justify-content: space-around; margin-bottom: 18px; }
+    .stat-val { font-family: 'Fredoka', sans-serif; font-size: 17px; font-weight: 700; color: var(--tile-bot); }
   </style>
 </head>
 <body>
 
-  <div class="game-container">
-    <!-- Brand Header -->
-    <header class="brand-header">
-      <div class="brand-left">
+  <div class="game-wrap">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
         <div class="deli-pill">deli <span>Genius</span></div>
         <span class="brand-title">SLIDING PUZZLE</span>
       </div>
       <div class="header-actions">
-        <!-- กล่องควบคุมเพลง BGM + ปรับเสียง -->
-        <div class="music-widget">
-          <button id="musicToggleBtn" class="icon-btn" title="เปิด/ปิดเพลง (BGM)" aria-label="Toggle Music">🎵</button>
-          <input type="range" id="volumeSlider" min="0" max="100" value="35" class="volume-slider" title="ปรับระดับเสียงเพลง" aria-label="Volume">
+        <div class="music-box">
+          <button id="musicToggleBtn" class="icon-btn" title="เปิด/ปิดเพลง">🎵</button>
+          <input type="range" id="volSlider" min="0" max="100" value="35" class="vol-slider" title="ระดับเสียง">
         </div>
-
-        <!-- ปุ่มเปลี่ยนสีธีม (ใหม่!) -->
-        <button id="colorModalBtn" class="btn-circle" title="เปลี่ยนสีธีมบล็อกและตัวเลข" aria-label="Change Theme Colors">🎨</button>
-
-        <!-- ปุ่มวิธีเล่น -->
-        <button id="helpBtn" class="btn-circle" title="วิธีเล่น" aria-label="Tutorial">❓</button>
-
-        <!-- ปุ่มสลับโหมด Dark/Light -->
-        <button id="themeToggle" class="theme-switch" aria-label="Toggle theme" title="สลับโหมด Dark / Light">
-          <div class="switch-handle">
-            <span id="switchIcon">☀️</span>
-          </div>
+        <button id="colorModalBtn" class="btn-circle" title="ปรับแต่งสี">🎨</button>
+        <button id="helpBtn" class="btn-circle" title="วิธีเล่น">❓</button>
+        <button id="themeToggle" class="theme-switch" title="สลับโหมด Dark/Light">
+          <div class="switch-handle"><span id="switchIcon">☀️</span></div>
         </button>
       </div>
     </header>
 
     <!-- Stats HUD -->
     <section class="hud">
-      <div class="hud-card">
-        <div class="hud-label">TIME</div>
-        <div id="timeDisplay" class="hud-val">00:00</div>
-      </div>
-      <div class="hud-card">
-        <div class="hud-label">MOVES</div>
-        <div id="movesDisplay" class="hud-val">0</div>
-      </div>
+      <div class="hud-card"><div class="hud-label">TIME</div><div id="timeDisplay" class="hud-val">00:00</div></div>
+      <div class="hud-card"><div class="hud-label">MOVES</div><div id="movesDisplay" class="hud-val">0</div></div>
     </section>
 
-    <!-- 4x4 Board Chassis -->
+    <!-- Board Chassis -->
     <main class="chassis">
       <div class="chassis-top">
         <div class="deli-pill" style="font-size: 11px; padding: 2px 7px;">deli <span>Genius</span></div>
@@ -652,111 +142,55 @@
       <div id="tray" class="tray"></div>
     </main>
 
-    <!-- Actions (เหลือแค่ปุ่มสุ่ม) -->
-    <footer class="actions">
-      <button id="shuffleBtn" class="btn btn-shuffle">🎲 สุ่มกระดานใหม่</button>
+    <!-- Controls -->
+    <footer>
+      <button id="shuffleBtn" class="btn-shuffle">🎲 สุ่มกระดานใหม่</button>
     </footer>
   </div>
 
-  <!-- COLOR CUSTOMIZER MODAL (หน้าต่างปรับแต่งสี) -->
+  <!-- Color Customizer Modal -->
   <div id="colorModal" class="modal">
     <div class="modal-box">
       <h2 class="modal-title">🎨 ปรับแต่งสีธีม</h2>
       <p class="modal-sub">เลือกสีบล็อกและสีตัวเลขได้ตามใจชอบ</p>
-
-      <!-- Live Preview Tile -->
-      <div class="preview-wrap">
-        <div id="previewTileCard" class="preview-tile-card">
-          <span id="previewNum" class="tile-num" style="font-size: 28px;">7</span>
-          <span id="previewWord" class="tile-word">seven</span>
-        </div>
+      <div class="preview-card" id="previewTileCard">
+        <span id="previewNum" class="tile-num" style="font-size: 28px;">7</span>
+        <span id="previewWord" class="tile-word">seven</span>
       </div>
-
-      <!-- 1. ปรับสีบล็อก -->
       <div class="color-section">
-        <div class="color-section-header">
-          <span>🟧 สีบล็อก (Block Color)</span>
-          <span id="blockColorHex" style="font-family: monospace;">#F27B48</span>
-        </div>
-        <div class="color-picker-row">
-          <div class="native-color-box" title="กดเพื่อเลือกสีอิสระ">
-            <input type="color" id="blockColorPicker" class="native-color-input" value="#F27B48">
-          </div>
-          <div class="swatches-bar">
-            <button class="swatch-btn" style="background: #F27B48;" data-color="#F27B48" title="ส้มคลาสสิก"></button>
-            <button class="swatch-btn" style="background: #EF4444;" data-color="#EF4444" title="แดงสดใส"></button>
-            <button class="swatch-btn" style="background: #F43F5E;" data-color="#F43F5E" title="ชมพูกุหลาบ"></button>
-            <button class="swatch-btn" style="background: #EC4899;" data-color="#EC4899" title="ชมพูพีช"></button>
-            <button class="swatch-btn" style="background: #8B5CF6;" data-color="#8B5CF6" title="ม่วงลาเวนเดอร์"></button>
-            <button class="swatch-btn" style="background: #6366F1;" data-color="#6366F1" title="ม่วงคราม"></button>
-            <button class="swatch-btn" style="background: #2563EB;" data-color="#2563EB" title="น้ำเงินสดใส"></button>
-            <button class="swatch-btn" style="background: #06B6D4;" data-color="#06B6D4" title="ฟ้าเทอร์ควอยซ์"></button>
-            <button class="swatch-btn" style="background: #10B981;" data-color="#10B981" title="เขียวมรกต"></button>
-            <button class="swatch-btn" style="background: #84CC16;" data-color="#84CC16" title="เขียวมะนาว"></button>
-            <button class="swatch-btn" style="background: #F59E0B;" data-color="#F59E0B" title="เหลืองทอง"></button>
-            <button class="swatch-btn" style="background: #374151;" data-color="#374151" title="ดำชาร์โคล"></button>
-          </div>
+        <div class="color-header"><span>🟧 สีบล็อก (12 สี)</span><span id="blockColorHex" style="font-family: monospace;">#F27B48</span></div>
+        <div class="color-row">
+          <div class="color-pick-wrap"><input type="color" id="blockColorPicker" value="#F27B48"></div>
+          <div class="swatches" id="blockSwatches"></div>
         </div>
       </div>
-
-      <!-- 2. ปรับสีตัวเลข -->
       <div class="color-section">
-        <div class="color-section-header">
-          <span>✏️ สีตัวเลข (Number Color)</span>
-          <span id="textColorHex" style="font-family: monospace;">#FFFFFF</span>
-        </div>
-        <div class="color-picker-row">
-          <div class="native-color-box" title="กดเพื่อเลือกสีอิสระ">
-            <input type="color" id="textColorPicker" class="native-color-input" value="#FFFFFF">
-          </div>
-          <div class="swatches-bar">
-            <button class="swatch-text-btn swatch-btn" style="background: #FFFFFF;" data-text-color="#FFFFFF" title="ขาวสว่าง"></button>
-            <button class="swatch-text-btn swatch-btn" style="background: #18181B;" data-text-color="#18181B" title="ดำสนิท"></button>
-            <button class="swatch-text-btn swatch-btn" style="background: #FEF08A;" data-text-color="#FEF08A" title="เหลืองพาสเทล"></button>
-            <button class="swatch-text-btn swatch-btn" style="background: #451A03;" data-text-color="#451A03" title="น้ำตาลเข้ม"></button>
-            <button class="swatch-text-btn swatch-btn" style="background: #064E3B;" data-text-color="#064E3B" title="เขียวแก่"></button>
-          </div>
+        <div class="color-header"><span>✏️ สีตัวเลข</span><span id="textColorHex" style="font-family: monospace;">#FFFFFF</span></div>
+        <div class="color-row">
+          <div class="color-pick-wrap"><input type="color" id="textColorPicker" value="#FFFFFF"></div>
+          <div class="swatches" id="textSwatches"></div>
         </div>
       </div>
-
-      <button id="closeColorModalBtn" class="btn btn-shuffle" style="width: 100%; margin-top: 4px;">
-        ✨ ใช้งานสีนี้
-      </button>
-
-      <div>
-        <button id="resetColorBtn" class="btn-reset-color">🔄 รีเซ็ตเป็นสีส้ม/ขาวเริ่มต้น</button>
-      </div>
+      <button id="closeColorModalBtn" class="btn-shuffle" style="margin-top: 4px;">✨ ใช้งานสีนี้</button>
+      <div><button id="resetColorBtn" class="btn-reset-color">🔄 รีเซ็ตเป็นสีเริ่มต้น</button></div>
     </div>
   </div>
 
-  <!-- TUTORIAL MODAL -->
+  <!-- Tutorial Modal -->
   <div id="tutorialModal" class="modal">
     <div class="modal-box">
       <div style="font-size: 42px; margin-bottom: 6px;">📖</div>
       <h2 class="modal-title">วิธีเล่น</h2>
       <p class="modal-sub">เกมเลื่อนตัวเลขแม่เหล็ก 15 ช่อง</p>
-
-      <div class="tutorial-steps">
-        <div class="step-card">
-          <span class="step-icon">🎯</span>
-          <div class="step-content">
-            <strong>เป้าหมายของเกม</strong>
-            <p>เลื่อนจัดเรียงตัวเลข 1 ถึง 15 จากซ้ายไปขวา บนลงล่าง โดยให้ช่องว่างอยู่มุมขวาล่างสุด</p>
-          </div>
-        </div>
-
-        <div class="step-card">
-          <span class="step-icon">👆</span>
-          <div class="step-content">
-            <strong>การเลื่อนบล็อก</strong>
-            <p>คลิกหรือแตะตัวเลขที่อยู่ติดช่องว่าง หรือกดตัวเลขแถวเดียวกันเพื่อดันเลื่อนทั้งแถวได้</p>
-          </div>
-        </div>
+      <div class="step-card">
+        <span style="font-size: 20px;">🎯</span>
+        <div><strong>เป้าหมายของเกม</strong><p style="font-size: 11.5px; color: var(--muted);">เลื่อนจัดเรียงตัวเลข 1 ถึง 15 จากซ้ายไปขวา บนลงล่าง โดยให้ช่องว่างอยู่มุมขวาล่างสุด</p></div>
       </div>
-
-      <button id="closeTutorialBtn" class="btn btn-shuffle" style="width: 100%;">
-        🚀 เข้าใจแล้ว เริ่มเล่นเลย!
-      </button>
+      <div class="step-card">
+        <span style="font-size: 20px;">👆</span>
+        <div><strong>การเลื่อนบล็อก</strong><p style="font-size: 11.5px; color: var(--muted);">คลิกหรือแตะตัวเลขที่อยู่ติดช่องว่าง หรือกดตัวเลขแถวเดียวกันเพื่อดันเลื่อนทั้งแถวได้</p></div>
+      </div>
+      <button id="closeTutorialBtn" class="btn-shuffle">🚀 เข้าใจแล้ว เริ่มเล่นเลย!</button>
     </div>
   </div>
 
@@ -767,538 +201,239 @@
       <h2 class="modal-title">สุดยอดมาก!</h2>
       <p class="modal-sub">คุณเรียงตัวเลข 1-15 สำเร็จแล้ว</p>
       <div class="modal-stats">
-        <div>
-          <div class="hud-label">เวลาที่ใช้</div>
-          <div id="finalTime" class="modal-stat-val">00:00</div>
-        </div>
-        <div>
-          <div class="hud-label">จำนวนก้าว</div>
-          <div id="finalMoves" class="modal-stat-val">0</div>
-        </div>
+        <div><div class="hud-label">เวลาที่ใช้</div><div id="finalTime" class="stat-val">00:00</div></div>
+        <div><div class="hud-label">จำนวนก้าว</div><div id="finalMoves" class="stat-val">0</div></div>
       </div>
-      <button id="playAgainBtn" class="btn btn-shuffle" style="width: 100%;">🎮 เล่นอีกรอบ</button>
+      <button id="playAgainBtn" class="btn-shuffle">🎮 เล่นอีกรอบ</button>
     </div>
   </div>
 
   <script>
     const WORDS = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen'];
-    const SIZE = 4;
-    const TOTAL = 16;
+    const BLOCK_COLORS = ['#F27B48','#EF4444','#F43F5E','#EC4899','#8B5CF6','#6366F1','#2563EB','#06B6D4','#10B981','#84CC16','#F59E0B','#374151'];
+    const TEXT_COLORS = ['#FFFFFF','#18181B','#FEF08A','#451A03','#064E3B'];
+    const SIZE = 4, TOTAL = 16;
 
-    let board = [];
-    let emptyIdx = 15;
-    let moves = 0;
-    let seconds = 0;
-    let timerId = null;
-    let isStarted = false;
-    let isWon = false;
-    let isShuffling = false;
+    let board = [], emptyIdx = 15, moves = 0, seconds = 0, timerId = null, isStarted = false, isWon = false, isShuffling = false;
+    const tray = document.getElementById('tray'), timeEl = document.getElementById('timeDisplay'), movesEl = document.getElementById('movesDisplay');
+    const tileEls = new Map(), modal = (id, open) => document.getElementById(id).classList.toggle('active', open);
 
-    const tray = document.getElementById('tray');
-    const timeEl = document.getElementById('timeDisplay');
-    const movesEl = document.getElementById('movesDisplay');
-    const winModal = document.getElementById('winModal');
-    const finalTimeEl = document.getElementById('finalTime');
-    const finalMovesEl = document.getElementById('finalMoves');
-    const tileEls = new Map();
-
-    // -------------------------------------------------------------
-    // Cozy Ambient BGM Engine (สังเคราะห์สดด้วย Web Audio API)
-    // -------------------------------------------------------------
-    class CozyMusicEngine {
+    // Audio Engine (BGM + ASMR Soft Tok)
+    class SoundEngine {
       constructor() {
-        this.ctx = null;
-        this.isPlaying = false;
-        this.isMuted = false;
-        this.masterGain = null;
-        this.volume = 0.35;
-        this.noteTimer = null;
-        this.step = 0;
-
+        this.ctx = null; this.isPlaying = false; this.isMuted = false; this.vol = 0.35; this.step = 0;
         this.scale = [
-          { chord: [174.61, 220.00, 261.63, 329.63], melody: [349.23, 440.00, 523.25, 659.25] },
-          { chord: [196.00, 246.94, 293.66, 392.00], melody: [392.00, 493.88, 587.33, 783.99] },
-          { chord: [164.81, 196.00, 246.94, 329.63], melody: [329.63, 392.00, 493.88, 659.25] },
-          { chord: [220.00, 261.63, 329.63, 392.00], melody: [440.00, 523.25, 659.25, 880.00] }
+          { chord: [174.61, 261.63], mel: [349.23, 440, 523.25, 659.25] },
+          { chord: [196.00, 293.66], mel: [392, 493.88, 587.33, 783.99] },
+          { chord: [164.81, 246.94], mel: [329.63, 392, 493.88, 659.25] },
+          { chord: [220.00, 329.63], mel: [440, 523.25, 659.25, 880] }
         ];
       }
-
       init() {
         if (!this.ctx) {
-          const AudioContext = window.AudioContext || window.webkitAudioContext;
-          if (AudioContext) {
-            this.ctx = new AudioContext();
-            this.masterGain = this.ctx.createGain();
-            this.masterGain.gain.setValueAtTime(this.isMuted ? 0 : this.volume, this.ctx.currentTime);
-            this.masterGain.connect(this.ctx.destination);
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (AC) {
+            this.ctx = new AC();
+            this.gain = this.ctx.createGain();
+            this.gain.gain.setValueAtTime(this.isMuted ? 0 : this.vol, this.ctx.currentTime);
+            this.gain.connect(this.ctx.destination);
           }
         }
-        if (this.ctx && this.ctx.state === 'suspended') {
-          this.ctx.resume();
-        }
+        if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
       }
-
-      playPluck(freq, duration = 0.5, gainMultiplier = 0.15) {
+      playNote(f, dur, gVal) {
         if (!this.ctx || this.isMuted) return;
-        const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        const filter = this.ctx.createBiquadFilter();
-
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(freq, now);
-
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(1400, now);
-        filter.frequency.exponentialRampToValueAtTime(300, now + duration);
-
-        gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.linearRampToValueAtTime(gainMultiplier, now + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
-        osc.connect(filter);
-        filter.connect(gain);
-        gain.connect(this.masterGain);
-
-        osc.start(now);
-        osc.stop(now + duration + 0.05);
+        const now = this.ctx.currentTime, osc = this.ctx.createOscillator(), g = this.ctx.createGain(), flt = this.ctx.createBiquadFilter();
+        osc.type = 'triangle'; osc.frequency.setValueAtTime(f, now);
+        flt.type = 'lowpass'; flt.frequency.setValueAtTime(1400, now);
+        g.gain.setValueAtTime(0.0001, now);
+        g.gain.linearRampToValueAtTime(gVal, now + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+        osc.connect(flt); flt.connect(g); g.connect(this.gain);
+        osc.start(now); osc.stop(now + dur + 0.05);
       }
-
-      tick() {
-        if (!this.isPlaying || this.isMuted) return;
-        const barIndex = Math.floor(this.step / 8) % this.scale.length;
-        const subStep = this.step % 8;
-        const currentBar = this.scale[barIndex];
-
-        if (subStep === 0) {
-          this.playPluck(currentBar.chord[0], 1.2, 0.08);
-          this.playPluck(currentBar.chord[1], 1.0, 0.05);
-        } else if (subStep === 4) {
-          this.playPluck(currentBar.chord[2], 0.9, 0.05);
-          this.playPluck(currentBar.chord[3], 0.9, 0.04);
-        }
-
-        if (subStep % 2 === 0 || Math.random() > 0.4) {
-          const melodyNote = currentBar.melody[Math.floor(Math.random() * currentBar.melody.length)];
-          this.playPluck(melodyNote, 0.6, 0.06);
-        }
-
-        this.step++;
-      }
-
-      start() {
-        this.init();
-        if (this.isPlaying) return;
-        this.isPlaying = true;
-        this.step = 0;
-        clearInterval(this.noteTimer);
-        this.noteTimer = setInterval(() => this.tick(), 380);
-      }
-
-      stop() {
-        this.isPlaying = false;
-        clearInterval(this.noteTimer);
-        this.noteTimer = null;
-      }
-
-      setVolume(val) {
-        this.volume = Math.max(0, Math.min(1, val));
-        if (this.masterGain && this.ctx && !this.isMuted) {
-          this.masterGain.gain.setValueAtTime(this.volume, this.ctx.currentTime);
-        }
-      }
-
-      toggleMute() {
-        this.isMuted = !this.isMuted;
-        if (this.masterGain && this.ctx) {
-          this.masterGain.gain.setValueAtTime(this.isMuted ? 0 : this.volume, this.ctx.currentTime);
-        }
-        if (!this.isMuted && !this.isPlaying) {
-          this.start();
-        }
-        return this.isMuted;
-      }
-
-      // เสียง "ต๊อก" แบบละมุนๆ สไตล์ไม้/แม่เหล็ก (ASMR Soft Clack)
       playTok() {
         if (this.isMuted) return;
         this.init();
         if (!this.ctx) return;
-        const now = this.ctx.currentTime;
-
-        const pitchVariation = 340 + (Math.random() * 30 - 15);
-
-        const oscBody = this.ctx.createOscillator();
-        const gainBody = this.ctx.createGain();
-        const filter = this.ctx.createBiquadFilter();
-
-        oscBody.type = 'sine';
-        oscBody.frequency.setValueAtTime(pitchVariation, now);
-        oscBody.frequency.exponentialRampToValueAtTime(140, now + 0.045);
-
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(1600, now);
-
-        gainBody.gain.setValueAtTime(0.001, now);
-        gainBody.gain.linearRampToValueAtTime(0.32, now + 0.003);
-        gainBody.gain.exponentialRampToValueAtTime(0.0001, now + 0.048);
-
-        oscBody.connect(filter);
-        filter.connect(gainBody);
-        gainBody.connect(this.masterGain);
-
-        oscBody.start(now);
-        oscBody.stop(now + 0.055);
-
-        const oscClick = this.ctx.createOscillator();
-        const gainClick = this.ctx.createGain();
-
-        oscClick.type = 'triangle';
-        oscClick.frequency.setValueAtTime(750, now);
-        oscClick.frequency.exponentialRampToValueAtTime(320, now + 0.015);
-
-        gainClick.gain.setValueAtTime(0.001, now);
-        gainClick.gain.linearRampToValueAtTime(0.14, now + 0.002);
-        gainClick.gain.exponentialRampToValueAtTime(0.0001, now + 0.018);
-
-        oscClick.connect(filter);
-        gainClick.connect(this.masterGain);
-
-        oscClick.start(now);
-        oscClick.stop(now + 0.022);
+        const now = this.ctx.currentTime, p = 340 + (Math.random() * 30 - 15);
+        const osc = this.ctx.createOscillator(), g = this.ctx.createGain(), flt = this.ctx.createBiquadFilter();
+        osc.type = 'sine'; osc.frequency.setValueAtTime(p, now);
+        osc.frequency.exponentialRampToValueAtTime(140, now + 0.045);
+        flt.type = 'lowpass'; flt.frequency.setValueAtTime(1600, now);
+        g.gain.setValueAtTime(0.001, now);
+        g.gain.linearRampToValueAtTime(0.32, now + 0.003);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + 0.048);
+        osc.connect(flt); flt.connect(g); g.connect(this.gain);
+        osc.start(now); osc.stop(now + 0.055);
+      }
+      start() {
+        this.init(); if (this.isPlaying) return; this.isPlaying = true;
+        this.timer = setInterval(() => {
+          if (!this.isPlaying || this.isMuted) return;
+          const bar = this.scale[Math.floor(this.step / 8) % 4], s = this.step % 8;
+          if (s === 0) this.playNote(bar.chord[0], 1.2, 0.07);
+          if (s % 2 === 0 || Math.random() > 0.4) this.playNote(bar.mel[Math.floor(Math.random() * 4)], 0.6, 0.05);
+          this.step++;
+        }, 380);
+      }
+      setVol(v) { this.vol = Math.max(0, Math.min(1, v)); if (this.gain && !this.isMuted) this.gain.gain.setValueAtTime(this.vol, this.ctx.currentTime); }
+      toggleMute() {
+        this.isMuted = !this.isMuted;
+        if (this.gain) this.gain.gain.setValueAtTime(this.isMuted ? 0 : this.vol, this.ctx.currentTime);
+        if (!this.isMuted && !this.isPlaying) this.start();
+        return this.isMuted;
       }
     }
 
-    const bgm = new CozyMusicEngine();
-    const musicToggleBtn = document.getElementById('musicToggleBtn');
-    const volumeSlider = document.getElementById('volumeSlider');
+    const sound = new SoundEngine();
+    const musicBtn = document.getElementById('musicToggleBtn'), volSlider = document.getElementById('volSlider');
+    musicBtn.onclick = () => {
+      sound.init();
+      if (!sound.isPlaying) { sound.start(); musicBtn.textContent = '🎵'; }
+      else musicBtn.textContent = sound.toggleMute() ? '🔇' : '🎵';
+    };
+    volSlider.oninput = (e) => {
+      const v = e.target.value / 100; sound.setVol(v);
+      musicBtn.textContent = v === 0 || sound.isMuted ? '🔇' : '🎵';
+    };
+    const autoStartAudio = () => { if (!sound.isPlaying && !sound.isMuted) sound.start(); window.removeEventListener('pointerdown', autoStartAudio); };
+    window.addEventListener('pointerdown', autoStartAudio);
 
-    musicToggleBtn.addEventListener('click', () => {
-      bgm.init();
-      if (!bgm.isPlaying) {
-        bgm.start();
-        musicToggleBtn.textContent = '🎵';
-        musicToggleBtn.title = 'ปิดเพลง (Mute)';
-      } else {
-        const isMuted = bgm.toggleMute();
-        musicToggleBtn.textContent = isMuted ? '🔇' : '🎵';
-        musicToggleBtn.title = isMuted ? 'เปิดเพลง (Unmute)' : 'ปิดเพลง (Mute)';
-      }
-    });
+    // Theme & Custom Colors
+    const adjustColor = (hex, p) => {
+      const num = parseInt(hex.replace('#',''), 16), r = (num>>16)&255, g = (num>>8)&255, b = num&255;
+      const cl = c => Math.min(255, Math.max(0, Math.round(c + (255 - c) * (p / 100))));
+      return `#${((1<<24) + (cl(r)<<16) + (cl(g)<<8) + cl(b)).toString(16).slice(1)}`;
+    };
 
-    volumeSlider.addEventListener('input', (e) => {
-      const vol = parseFloat(e.target.value) / 100;
-      bgm.setVolume(vol);
-      if (vol === 0) {
-        musicToggleBtn.textContent = '🔇';
-      } else if (!bgm.isMuted) {
-        musicToggleBtn.textContent = '🎵';
-      }
-    });
-
-    function autoStartMusic() {
-      if (!bgm.isPlaying && !bgm.isMuted) {
-        bgm.start();
-      }
-      window.removeEventListener('pointerdown', autoStartMusic);
-    }
-    window.addEventListener('pointerdown', autoStartMusic);
-
-    // -------------------------------------------------------------
-    // ระบบปรับแต่งสีธีม (Theme Color Customizer)
-    // -------------------------------------------------------------
-    const DEFAULT_BLOCK_COLOR = '#F27B48';
-    const DEFAULT_TEXT_COLOR = '#FFFFFF';
-
-    let currentBlockColor = localStorage.getItem('puzzle_block_color') || DEFAULT_BLOCK_COLOR;
-    let currentTextColor = localStorage.getItem('puzzle_text_color') || DEFAULT_TEXT_COLOR;
-
-    const colorModal = document.getElementById('colorModal');
-    const colorModalBtn = document.getElementById('colorModalBtn');
-    const closeColorModalBtn = document.getElementById('closeColorModalBtn');
-    const resetColorBtn = document.getElementById('resetColorBtn');
-    const blockColorPicker = document.getElementById('blockColorPicker');
-    const textColorPicker = document.getElementById('textColorPicker');
-    const blockColorHex = document.getElementById('blockColorHex');
-    const textColorHex = document.getElementById('textColorHex');
-    const previewTileCard = document.getElementById('previewTileCard');
-    const previewNum = document.getElementById('previewNum');
-    const previewWord = document.getElementById('previewWord');
-
-    function hexToRgb(hex) {
-      let c = hex.replace('#', '');
-      if (c.length === 3) c = c.split('').map(x => x + x).join('');
-      const num = parseInt(c, 16);
-      return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
-    }
-
-    function adjustColorBrightness(hex, percent) {
-      const rgb = hexToRgb(hex);
-      const r = Math.min(255, Math.max(0, Math.round(rgb.r + (255 - rgb.r) * (percent / 100))));
-      const g = Math.min(255, Math.max(0, Math.round(rgb.g + (255 - rgb.g) * (percent / 100))));
-      const b = Math.min(255, Math.max(0, Math.round(rgb.b + (255 - rgb.b) * (percent / 100))));
-      return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
-    }
-
-    function applyThemeColors(blockHex, textHex) {
-      currentBlockColor = blockHex;
-      currentTextColor = textHex;
-
-      const topHex = adjustColorBrightness(blockHex, 22);
-      const borderHex = adjustColorBrightness(blockHex, 14);
-      const rgb = hexToRgb(blockHex);
-      const shadow = `rgba(${Math.round(rgb.r * 0.7)}, ${Math.round(rgb.g * 0.7)}, ${Math.round(rgb.b * 0.7)}, 0.32)`;
-
-      // อัปเดต CSS Variables ของหน้าเว็บ
-      document.documentElement.style.setProperty('--tile-top', topHex);
-      document.documentElement.style.setProperty('--tile-bot', blockHex);
-      document.documentElement.style.setProperty('--tile-border', borderHex);
-      document.documentElement.style.setProperty('--tile-shadow', shadow);
-      document.documentElement.style.setProperty('--tile-text', textHex);
-      document.documentElement.style.setProperty('--tile-subtext', textHex + 'D9');
-
-      // อัปเดตการแสดงผลในหน้าต่างปรับสี
-      blockColorPicker.value = blockHex;
-      textColorPicker.value = textHex;
-      blockColorHex.textContent = blockHex.toUpperCase();
-      textColorHex.textContent = textHex.toUpperCase();
-
-      previewTileCard.style.background = `linear-gradient(145deg, ${topHex}, ${blockHex})`;
-      previewTileCard.style.borderColor = borderHex;
-      previewTileCard.style.boxShadow = `0 6px 14px ${shadow}`;
-      previewNum.style.color = textHex;
-      previewWord.style.color = textHex + 'D9';
-
+    function applyColors(blockHex, textHex) {
       localStorage.setItem('puzzle_block_color', blockHex);
       localStorage.setItem('puzzle_text_color', textHex);
+      const topHex = adjustColor(blockHex, 22), bdr = adjustColor(blockHex, 14);
+      const num = parseInt(blockHex.replace('#',''), 16), r = (num>>16)&255, g = (num>>8)&255, b = num&255;
+      const shd = `rgba(${Math.round(r*0.7)}, ${Math.round(g*0.7)}, ${Math.round(b*0.7)}, 0.32)`;
+      
+      const s = document.documentElement.style;
+      s.setProperty('--tile-top', topHex); s.setProperty('--tile-bot', blockHex);
+      s.setProperty('--tile-border', bdr); s.setProperty('--tile-shadow', shd);
+      s.setProperty('--tile-text', textHex); s.setProperty('--tile-subtext', textHex + 'D9');
+
+      document.getElementById('blockColorPicker').value = blockHex;
+      document.getElementById('textColorPicker').value = textHex;
+      document.getElementById('blockColorHex').textContent = blockHex.toUpperCase();
+      document.getElementById('textColorHex').textContent = textHex.toUpperCase();
+
+      const p = document.getElementById('previewTileCard');
+      p.style.background = `linear-gradient(145deg, ${topHex}, ${blockHex})`;
+      p.style.borderColor = bdr; p.style.boxShadow = `0 6px 14px ${shd}`;
+      document.getElementById('previewNum').style.color = textHex;
+      document.getElementById('previewWord').style.color = textHex + 'D9';
     }
 
-    // Event listeners สำหรับ Color Modal
-    colorModalBtn.onclick = () => colorModal.classList.add('active');
-    closeColorModalBtn.onclick = () => colorModal.classList.remove('active');
-    colorModal.onclick = (e) => {
-      if (e.target === colorModal) colorModal.classList.remove('active');
-    };
-
-    blockColorPicker.addEventListener('input', (e) => {
-      applyThemeColors(e.target.value, currentTextColor);
+    // Dynamic Swatches
+    const blockBox = document.getElementById('blockSwatches'), textBox = document.getElementById('textSwatches');
+    BLOCK_COLORS.forEach(c => {
+      const b = document.createElement('button'); b.className = 'swatch'; b.style.background = c;
+      b.onclick = () => applyColors(c, document.getElementById('textColorPicker').value);
+      blockBox.appendChild(b);
+    });
+    TEXT_COLORS.forEach(c => {
+      const b = document.createElement('button'); b.className = 'swatch'; b.style.background = c;
+      b.onclick = () => applyColors(document.getElementById('blockColorPicker').value, c);
+      textBox.appendChild(b);
     });
 
-    textColorPicker.addEventListener('input', (e) => {
-      applyThemeColors(currentBlockColor, e.target.value);
-    });
+    document.getElementById('blockColorPicker').oninput = e => applyColors(e.target.value, document.getElementById('textColorPicker').value);
+    document.getElementById('textColorPicker').oninput = e => applyColors(document.getElementById('blockColorPicker').value, e.target.value);
+    document.getElementById('resetColorBtn').onclick = () => applyColors('#F27B48', '#FFFFFF');
+    document.getElementById('colorModalBtn').onclick = () => modal('colorModal', true);
+    document.getElementById('closeColorModalBtn').onclick = () => modal('colorModal', false);
+    document.getElementById('colorModal').onclick = e => { if (e.target.id === 'colorModal') modal('colorModal', false); };
 
-    // Swatches สำหรับสีบล็อก
-    document.querySelectorAll('.swatch-btn[data-color]').forEach(btn => {
-      btn.onclick = () => applyThemeColors(btn.dataset.color, currentTextColor);
-    });
-
-    // Swatches สำหรับสีตัวเลข
-    document.querySelectorAll('.swatch-text-btn[data-text-color]').forEach(btn => {
-      btn.onclick = () => applyThemeColors(currentBlockColor, btn.dataset.textColor);
-    });
-
-    // รีเซ็ตค่าเริ่มต้น
-    resetColorBtn.onclick = () => {
-      applyThemeColors(DEFAULT_BLOCK_COLOR, DEFAULT_TEXT_COLOR);
-    };
-
-    // โหลดสีที่เคยบันทึกไว้
-    applyThemeColors(currentBlockColor, currentTextColor);
-
-    // Tutorial Elements
-    const tutorialModal = document.getElementById('tutorialModal');
-    const closeTutorialBtn = document.getElementById('closeTutorialBtn');
-    const helpBtn = document.getElementById('helpBtn');
-
-    function openTutorial() {
-      tutorialModal.classList.add('active');
-    }
-
-    function closeTutorial() {
-      tutorialModal.classList.remove('active');
-      localStorage.setItem('puzzle_tutorial_seen', 'true');
-    }
-
-    closeTutorialBtn.onclick = closeTutorial;
-    helpBtn.onclick = openTutorial;
-    tutorialModal.onclick = (e) => {
-      if (e.target === tutorialModal) closeTutorial();
-    };
-
-    function checkFirstVisit() {
-      if (!localStorage.getItem('puzzle_tutorial_seen')) {
-        openTutorial();
-      }
-    }
-
-    // ระบบสลับโหมด Dark / Light
-    const themeToggle = document.getElementById('themeToggle');
-    const switchIcon = document.getElementById('switchIcon');
-
-    function setTheme(theme) {
+    // Dark/Light Mode
+    const switchTheme = theme => {
       document.documentElement.setAttribute('data-theme', theme);
-      switchIcon.textContent = theme === 'dark' ? '🌙' : '☀️';
+      document.getElementById('switchIcon').textContent = theme === 'dark' ? '🌙' : '☀️';
       localStorage.setItem('puzzle_theme', theme);
-    }
+    };
+    document.getElementById('themeToggle').onclick = () => switchTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
 
-    const savedTheme = localStorage.getItem('puzzle_theme') || 'light';
-    setTheme(savedTheme);
+    // Tutorial
+    document.getElementById('helpBtn').onclick = () => modal('tutorialModal', true);
+    document.getElementById('closeTutorialBtn').onclick = () => { modal('tutorialModal', false); localStorage.setItem('puzzle_tutorial_seen', '1'); };
+    document.getElementById('tutorialModal').onclick = e => { if (e.target.id === 'tutorialModal') modal('tutorialModal', false); };
 
-    themeToggle.addEventListener('click', () => {
-      const current = document.documentElement.getAttribute('data-theme');
-      setTheme(current === 'dark' ? 'light' : 'dark');
-    });
-
-    // สร้าง DOM บล็อก 1-15
+    // Tiles & Puzzle Logic
     function createTiles() {
-      tray.innerHTML = '';
-      tileEls.clear();
-      for (let num = 1; num < TOTAL; num++) {
-        const el = document.createElement('div');
-        el.className = 'tile';
-        el.innerHTML = `
-          <div class="tile-inner">
-            <span class="tile-num">${num}</span>
-            <span class="tile-word">${WORDS[num]}</span>
-          </div>`;
-        el.addEventListener('pointerdown', (e) => {
-          e.preventDefault();
-          moveTile(num);
-        });
-        tray.appendChild(el);
-        tileEls.set(num, el);
+      tray.innerHTML = ''; tileEls.clear();
+      for (let n = 1; n < TOTAL; n++) {
+        const el = document.createElement('div'); el.className = 'tile';
+        el.innerHTML = `<div class="tile-inner"><span class="tile-num">${n}</span><span class="tile-word">${WORDS[n]}</span></div>`;
+        el.onpointerdown = e => { e.preventDefault(); moveTile(n); };
+        tray.appendChild(el); tileEls.set(n, el);
       }
     }
-
-    function render() {
-      for (let idx = 0; idx < TOTAL; idx++) {
-        const num = board[idx];
-        if (num === 0) continue;
-        const row = Math.floor(idx / SIZE);
-        const col = idx % SIZE;
-        tileEls.get(num).style.transform = `translate3d(${col * 100}%, ${row * 100}%, 0)`;
-      }
-    }
+    const render = () => board.forEach((n, idx) => {
+      if (n) tileEls.get(n).style.transform = `translate3d(${(idx % SIZE) * 100}%, ${Math.floor(idx / SIZE) * 100}%, 0)`;
+    });
 
     function moveTile(num) {
       if (isWon || isShuffling) return;
-      const clickedIdx = board.indexOf(num);
-      const cRow = Math.floor(clickedIdx / SIZE), cCol = clickedIdx % SIZE;
+      const idx = board.indexOf(num), cRow = Math.floor(idx / SIZE), cCol = idx % SIZE;
       const eRow = Math.floor(emptyIdx / SIZE), eCol = emptyIdx % SIZE;
-
       let moved = false;
+
       if (cCol === eCol) {
         const step = cRow < eRow ? 1 : -1;
-        for (let r = eRow; r !== cRow; r -= step) {
-          board[r * SIZE + cCol] = board[(r - step) * SIZE + cCol];
-        }
+        for (let r = eRow; r !== cRow; r -= step) board[r * SIZE + cCol] = board[(r - step) * SIZE + cCol];
         moved = true;
       } else if (cRow === eRow) {
         const step = cCol < eCol ? 1 : -1;
-        for (let c = eCol; c !== cCol; c -= step) {
-          board[cRow * SIZE + c] = board[cRow * SIZE + (c - step)];
-        }
+        for (let c = eCol; c !== cCol; c -= step) board[cRow * SIZE + c] = board[cRow * SIZE + (c - step)];
         moved = true;
       }
 
       if (moved) {
-        board[clickedIdx] = 0;
-        emptyIdx = clickedIdx;
-        render();
-        bgm.playTok();
-        if (!isStarted) startTimer();
-        moves++;
-        movesEl.textContent = moves;
-        checkWin();
+        board[idx] = 0; emptyIdx = idx; render(); sound.playTok();
+        if (!isStarted) { isStarted = true; timerId = setInterval(() => { seconds++; timeEl.textContent = `${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`; }, 1000); }
+        movesEl.textContent = ++moves;
+        if (board.every((val, i) => (i === TOTAL - 1 ? val === 0 : val === i + 1))) {
+          isWon = true; clearInterval(timerId);
+          document.getElementById('finalTime').textContent = timeEl.textContent;
+          document.getElementById('finalMoves').textContent = moves;
+          setTimeout(() => modal('winModal', true), 300);
+        }
       }
     }
 
     function shuffle() {
-      if (isShuffling) return;
-      isShuffling = true;
-      resetGame();
-
+      if (isShuffling) return; isShuffling = true;
+      clearInterval(timerId); seconds = moves = 0; isStarted = isWon = false;
+      timeEl.textContent = '00:00'; movesEl.textContent = '0'; modal('winModal', false);
+      board = Array.from({ length: TOTAL - 1 }, (_, i) => i + 1); board.push(0); emptyIdx = TOTAL - 1;
       tileEls.forEach(el => el.style.transition = 'none');
-
-      let lastEmpty = -1;
+      
+      let last = -1;
       for (let i = 0; i < 180; i++) {
-        const row = Math.floor(emptyIdx / SIZE), col = emptyIdx % SIZE;
-        const neighbors = [];
-        if (row > 0) neighbors.push((row - 1) * SIZE + col);
-        if (row < SIZE - 1) neighbors.push((row + 1) * SIZE + col);
-        if (col > 0) neighbors.push(row * SIZE + (col - 1));
-        if (col < SIZE - 1) neighbors.push(row * SIZE + (col + 1));
-
-        const valid = neighbors.filter(idx => idx !== lastEmpty);
-        const chosen = valid.length ? valid[Math.floor(Math.random() * valid.length)] : neighbors[0];
-
-        lastEmpty = emptyIdx;
-        board[emptyIdx] = board[chosen];
-        board[chosen] = 0;
-        emptyIdx = chosen;
+        const r = Math.floor(emptyIdx / SIZE), c = emptyIdx % SIZE, n = [];
+        if (r > 0) n.push((r - 1) * SIZE + c); if (r < SIZE - 1) n.push((r + 1) * SIZE + c);
+        if (c > 0) n.push(r * SIZE + (c - 1)); if (c < SIZE - 1) n.push(r * SIZE + (c + 1));
+        const valid = n.filter(x => x !== last);
+        const chosen = valid.length ? valid[Math.floor(Math.random() * valid.length)] : n[0];
+        last = emptyIdx; board[emptyIdx] = board[chosen]; board[chosen] = 0; emptyIdx = chosen;
       }
-
       render();
-      requestAnimationFrame(() => {
-        setTimeout(() => {
-          tileEls.forEach(el => el.style.transition = '');
-          isShuffling = false;
-        }, 30);
-      });
+      requestAnimationFrame(() => setTimeout(() => { tileEls.forEach(el => el.style.transition = ''); isShuffling = false; }, 30));
     }
 
-    function resetGame() {
-      stopTimer();
-      seconds = 0;
-      moves = 0;
-      isStarted = false;
-      isWon = false;
-      timeEl.textContent = '00:00';
-      movesEl.textContent = '0';
-      winModal.classList.remove('active');
-
-      board = Array.from({ length: TOTAL - 1 }, (_, i) => i + 1);
-      board.push(0);
-      emptyIdx = TOTAL - 1;
-      render();
-    }
-
-    function checkWin() {
-      for (let i = 0; i < TOTAL - 1; i++) {
-        if (board[i] !== i + 1) return;
-      }
-      isWon = true;
-      stopTimer();
-      finalTimeEl.textContent = timeEl.textContent;
-      finalMovesEl.textContent = moves;
-      setTimeout(() => winModal.classList.add('active'), 300);
-    }
-
-    function startTimer() {
-      isStarted = true;
-      clearInterval(timerId);
-      timerId = setInterval(() => {
-        seconds++;
-        const m = String(Math.floor(seconds / 60)).padStart(2, '0');
-        const s = String(seconds % 60).padStart(2, '0');
-        timeEl.textContent = `${m}:${s}`;
-      }, 1000);
-    }
-
-    function stopTimer() {
-      clearInterval(timerId);
-      timerId = null;
-    }
-
-    // Event listeners
+    // Init App
+    switchTheme(localStorage.getItem('puzzle_theme') || 'light');
+    applyColors(localStorage.getItem('puzzle_block_color') || '#F27B48', localStorage.getItem('puzzle_text_color') || '#FFFFFF');
     document.getElementById('shuffleBtn').onclick = () => shuffle();
     document.getElementById('playAgainBtn').onclick = () => shuffle();
-
-    // Start
-    createTiles();
-    shuffle();
-    checkFirstVisit();
+    createTiles(); shuffle();
+    if (!localStorage.getItem('puzzle_tutorial_seen')) modal('tutorialModal', true);
   </script>
 </body>
 </html>
