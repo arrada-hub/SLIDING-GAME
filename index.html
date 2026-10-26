@@ -6,7 +6,7 @@
   <title>Sliding Block Puzzle (4x4)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Prompt:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #FAF5EE;
@@ -16,18 +16,22 @@
       --chassis-shadow: rgba(160, 115, 65, 0.2);
       --tray: #EFE7D8;
       --tray-shadow: rgba(120, 90, 50, 0.18);
+      
+      /* สีบล็อกและตัวเลข (ปรับเปลี่ยนได้ตาม Theme Color) */
       --tile-top: #FFAA7E;
       --tile-bot: #F27B48;
       --tile-border: #FFBFA0;
       --tile-shadow: rgba(190, 75, 25, 0.28);
+      --tile-text: #FFFFFF;
+      --tile-subtext: #FFE6DA;
+      
       --card-bg: #FFFFFF;
       --card-border: #F1E5CF;
       --badge-bg: rgba(255, 255, 255, 0.6);
       --badge-text: #966734;
       --text: #4A3A2A;
       --muted: #8C7B6B;
-      --btn-reset-bg: #FFFFFF;
-      --btn-reset-border: #E4D5BC;
+      --slider-track: #E4D5BC;
     }
 
     [data-theme="dark"] {
@@ -38,18 +42,13 @@
       --chassis-shadow: rgba(0, 0, 0, 0.65);
       --tray: #171411;
       --tray-shadow: rgba(0, 0, 0, 0.7);
-      --tile-top: #FF8F54;
-      --tile-bot: #D85520;
-      --tile-border: #FF9F6B;
-      --tile-shadow: rgba(0, 0, 0, 0.5);
       --card-bg: #211D18;
       --card-border: #383025;
       --badge-bg: rgba(255, 255, 255, 0.08);
       --badge-text: #E5D5C5;
       --text: #F7EEE5;
       --muted: #A89B8B;
-      --btn-reset-bg: #211D18;
-      --btn-reset-border: #383025;
+      --slider-track: #3D352B;
     }
 
     * {
@@ -119,12 +118,102 @@
       letter-spacing: 0.5px;
     }
 
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Music Control Box */
+    .music-widget {
+      display: flex;
+      align-items: center;
+      background: var(--card-bg);
+      border: 2px solid var(--card-border);
+      border-radius: 20px;
+      padding: 2px 6px 2px 3px;
+      gap: 6px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: none;
+      color: var(--text);
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+
+    .icon-btn:active {
+      transform: scale(0.9);
+    }
+
+    /* Volume Slider */
+    .volume-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 48px;
+      height: 4px;
+      border-radius: 4px;
+      background: var(--slider-track);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--tile-bot, #F27B48);
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    }
+
+    .volume-slider::-moz-range-thumb {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--tile-bot, #F27B48);
+      cursor: pointer;
+      border: none;
+    }
+
+    /* Single Circle Action Buttons */
+    .btn-circle {
+      background: var(--card-bg);
+      border: 2px solid var(--card-border);
+      color: var(--text);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+      transition: transform 0.1s ease;
+    }
+
+    .btn-circle:active {
+      transform: scale(0.92);
+    }
+
     /* Dark/Light Switch */
     .theme-switch {
       background: #EAE1D1;
       border: 2px solid #DACAB3;
       border-radius: 20px;
-      width: 52px;
+      width: 48px;
       height: 28px;
       cursor: pointer;
       position: relative;
@@ -136,8 +225,8 @@
     }
 
     .switch-handle {
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
       background: white;
       display: flex;
@@ -145,7 +234,7 @@
       justify-content: center;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
       transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.25, 1), background-color 0.25s ease;
-      font-size: 12px;
+      font-size: 11px;
     }
 
     [data-theme="dark"] .theme-switch {
@@ -154,8 +243,8 @@
     }
 
     [data-theme="dark"] .switch-handle {
-      transform: translateX(24px);
-      background: #FF9E64;
+      transform: translateX(20px);
+      background: var(--tile-top, #FF9E64);
     }
 
     /* HUD Stats */
@@ -249,8 +338,8 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      color: white;
-      transition: transform 0.08s ease;
+      color: var(--tile-text);
+      transition: transform 0.08s ease, background 0.2s ease, border-color 0.2s ease;
     }
 
     .tile:active .tile-inner {
@@ -262,14 +351,15 @@
       font-size: 26px;
       font-weight: 700;
       line-height: 1;
-      text-shadow: 0 1px 2px rgba(120, 40, 10, 0.3);
+      color: var(--tile-text);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
     }
 
     .tile-word {
       font-family: 'Fredoka', sans-serif;
       font-size: 9px;
       font-weight: 500;
-      color: #FFE6DA;
+      color: var(--tile-subtext);
       margin-top: 2px;
       line-height: 1;
     }
@@ -300,13 +390,13 @@
     }
 
     .btn-shuffle {
-      background: linear-gradient(145deg, #FF8E5E, #F26733);
-      color: white;
+      background: linear-gradient(145deg, var(--tile-top, #FF8E5E), var(--tile-bot, #F26733));
+      color: var(--tile-text, white);
       border: none;
-      box-shadow: 0 6px 14px rgba(242, 103, 51, 0.35);
+      box-shadow: 0 6px 14px var(--tile-shadow, rgba(242, 103, 51, 0.35));
     }
 
-    /* Win Modal */
+    /* Modals */
     .modal {
       position: fixed;
       inset: 0;
@@ -331,16 +421,11 @@
       background: var(--card-bg);
       border: 4px solid var(--chassis-border);
       border-radius: 26px;
-      padding: 26px;
+      padding: 24px 20px;
       width: 100%;
-      max-width: 320px;
+      max-width: 340px;
       text-align: center;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-    }
-
-    .modal-trophy {
-      font-size: 48px;
-      margin-bottom: 6px;
     }
 
     .modal-title {
@@ -353,7 +438,149 @@
     .modal-sub {
       font-size: 13px;
       color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    /* --------------------------------------------------
+       COLOR CUSTOMIZER MODAL STYLES
+       -------------------------------------------------- */
+    .preview-wrap {
+      display: flex;
+      justify-content: center;
       margin-bottom: 16px;
+    }
+
+    .preview-tile-card {
+      width: 72px;
+      height: 72px;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--tile-border);
+      background: linear-gradient(145deg, var(--tile-top), var(--tile-bot));
+      box-shadow: 0 6px 14px var(--tile-shadow);
+      transition: all 0.15s ease;
+    }
+
+    .color-section {
+      text-align: left;
+      margin-bottom: 14px;
+    }
+
+    .color-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .color-picker-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .native-color-box {
+      width: 38px;
+      height: 34px;
+      border-radius: 10px;
+      border: 2px solid var(--card-border);
+      overflow: hidden;
+      flex-shrink: 0;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .native-color-input {
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      width: 60px;
+      height: 60px;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    .swatches-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .swatch-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid white;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+
+    .swatch-btn:active {
+      transform: scale(0.85);
+    }
+
+    .swatch-btn:hover {
+      transform: scale(1.15);
+    }
+
+    .btn-reset-color {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-family: 'Prompt', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: underline;
+      margin-top: 6px;
+      display: inline-block;
+    }
+
+    /* Tutorial Steps */
+    .tutorial-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .step-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: var(--tray);
+      padding: 10px 12px;
+      border-radius: 14px;
+    }
+
+    .step-icon {
+      font-size: 20px;
+      line-height: 1.2;
+      flex-shrink: 0;
+    }
+
+    .step-content strong {
+      font-size: 13px;
+      color: var(--text);
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .step-content p {
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.35;
+      margin: 0;
     }
 
     .modal-stats {
@@ -369,24 +596,39 @@
       font-family: 'Fredoka', sans-serif;
       font-size: 17px;
       font-weight: 700;
-      color: #E85B28;
+      color: var(--tile-bot, #E85B28);
     }
   </style>
 </head>
 <body>
 
   <div class="game-container">
-    <!-- Brand Header พร้อมปุ่มสลับ Dark/Light Mode -->
+    <!-- Brand Header -->
     <header class="brand-header">
       <div class="brand-left">
         <div class="deli-pill">deli <span>Genius</span></div>
         <span class="brand-title">SLIDING PUZZLE</span>
       </div>
-      <button id="themeToggle" class="theme-switch" aria-label="Toggle theme" title="สลับโหมด Dark / Light">
-        <div class="switch-handle">
-          <span id="switchIcon">☀️</span>
+      <div class="header-actions">
+        <!-- กล่องควบคุมเพลง BGM + ปรับเสียง -->
+        <div class="music-widget">
+          <button id="musicToggleBtn" class="icon-btn" title="เปิด/ปิดเพลง (BGM)" aria-label="Toggle Music">🎵</button>
+          <input type="range" id="volumeSlider" min="0" max="100" value="35" class="volume-slider" title="ปรับระดับเสียงเพลง" aria-label="Volume">
         </div>
-      </button>
+
+        <!-- ปุ่มเปลี่ยนสีธีม (ใหม่!) -->
+        <button id="colorModalBtn" class="btn-circle" title="เปลี่ยนสีธีมบล็อกและตัวเลข" aria-label="Change Theme Colors">🎨</button>
+
+        <!-- ปุ่มวิธีเล่น -->
+        <button id="helpBtn" class="btn-circle" title="วิธีเล่น" aria-label="Tutorial">❓</button>
+
+        <!-- ปุ่มสลับโหมด Dark/Light -->
+        <button id="themeToggle" class="theme-switch" aria-label="Toggle theme" title="สลับโหมด Dark / Light">
+          <div class="switch-handle">
+            <span id="switchIcon">☀️</span>
+          </div>
+        </button>
+      </div>
     </header>
 
     <!-- Stats HUD -->
@@ -410,16 +652,118 @@
       <div id="tray" class="tray"></div>
     </main>
 
-    <!-- Actions -->
+    <!-- Actions (เหลือแค่ปุ่มสุ่ม) -->
     <footer class="actions">
       <button id="shuffleBtn" class="btn btn-shuffle">🎲 สุ่มกระดานใหม่</button>
     </footer>
   </div>
 
+  <!-- COLOR CUSTOMIZER MODAL (หน้าต่างปรับแต่งสี) -->
+  <div id="colorModal" class="modal">
+    <div class="modal-box">
+      <h2 class="modal-title">🎨 ปรับแต่งสีธีม</h2>
+      <p class="modal-sub">เลือกสีบล็อกและสีตัวเลขได้ตามใจชอบ</p>
+
+      <!-- Live Preview Tile -->
+      <div class="preview-wrap">
+        <div id="previewTileCard" class="preview-tile-card">
+          <span id="previewNum" class="tile-num" style="font-size: 28px;">7</span>
+          <span id="previewWord" class="tile-word">seven</span>
+        </div>
+      </div>
+
+      <!-- 1. ปรับสีบล็อก -->
+      <div class="color-section">
+        <div class="color-section-header">
+          <span>🟧 สีบล็อก (Block Color)</span>
+          <span id="blockColorHex" style="font-family: monospace;">#F27B48</span>
+        </div>
+        <div class="color-picker-row">
+          <div class="native-color-box" title="กดเพื่อเลือกสีอิสระ">
+            <input type="color" id="blockColorPicker" class="native-color-input" value="#F27B48">
+          </div>
+          <div class="swatches-bar">
+            <button class="swatch-btn" style="background: #F27B48;" data-color="#F27B48" title="ส้มคลาสสิก"></button>
+            <button class="swatch-btn" style="background: #EF4444;" data-color="#EF4444" title="แดงสดใส"></button>
+            <button class="swatch-btn" style="background: #F43F5E;" data-color="#F43F5E" title="ชมพูกุหลาบ"></button>
+            <button class="swatch-btn" style="background: #EC4899;" data-color="#EC4899" title="ชมพูพีช"></button>
+            <button class="swatch-btn" style="background: #8B5CF6;" data-color="#8B5CF6" title="ม่วงลาเวนเดอร์"></button>
+            <button class="swatch-btn" style="background: #6366F1;" data-color="#6366F1" title="ม่วงคราม"></button>
+            <button class="swatch-btn" style="background: #2563EB;" data-color="#2563EB" title="น้ำเงินสดใส"></button>
+            <button class="swatch-btn" style="background: #06B6D4;" data-color="#06B6D4" title="ฟ้าเทอร์ควอยซ์"></button>
+            <button class="swatch-btn" style="background: #10B981;" data-color="#10B981" title="เขียวมรกต"></button>
+            <button class="swatch-btn" style="background: #84CC16;" data-color="#84CC16" title="เขียวมะนาว"></button>
+            <button class="swatch-btn" style="background: #F59E0B;" data-color="#F59E0B" title="เหลืองทอง"></button>
+            <button class="swatch-btn" style="background: #374151;" data-color="#374151" title="ดำชาร์โคล"></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. ปรับสีตัวเลข -->
+      <div class="color-section">
+        <div class="color-section-header">
+          <span>✏️ สีตัวเลข (Number Color)</span>
+          <span id="textColorHex" style="font-family: monospace;">#FFFFFF</span>
+        </div>
+        <div class="color-picker-row">
+          <div class="native-color-box" title="กดเพื่อเลือกสีอิสระ">
+            <input type="color" id="textColorPicker" class="native-color-input" value="#FFFFFF">
+          </div>
+          <div class="swatches-bar">
+            <button class="swatch-text-btn swatch-btn" style="background: #FFFFFF;" data-text-color="#FFFFFF" title="ขาวสว่าง"></button>
+            <button class="swatch-text-btn swatch-btn" style="background: #18181B;" data-text-color="#18181B" title="ดำสนิท"></button>
+            <button class="swatch-text-btn swatch-btn" style="background: #FEF08A;" data-text-color="#FEF08A" title="เหลืองพาสเทล"></button>
+            <button class="swatch-text-btn swatch-btn" style="background: #451A03;" data-text-color="#451A03" title="น้ำตาลเข้ม"></button>
+            <button class="swatch-text-btn swatch-btn" style="background: #064E3B;" data-text-color="#064E3B" title="เขียวแก่"></button>
+          </div>
+        </div>
+      </div>
+
+      <button id="closeColorModalBtn" class="btn btn-shuffle" style="width: 100%; margin-top: 4px;">
+        ✨ ใช้งานสีนี้
+      </button>
+
+      <div>
+        <button id="resetColorBtn" class="btn-reset-color">🔄 รีเซ็ตเป็นสีส้ม/ขาวเริ่มต้น</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TUTORIAL MODAL -->
+  <div id="tutorialModal" class="modal">
+    <div class="modal-box">
+      <div style="font-size: 42px; margin-bottom: 6px;">📖</div>
+      <h2 class="modal-title">วิธีเล่น</h2>
+      <p class="modal-sub">เกมเลื่อนตัวเลขแม่เหล็ก 15 ช่อง</p>
+
+      <div class="tutorial-steps">
+        <div class="step-card">
+          <span class="step-icon">🎯</span>
+          <div class="step-content">
+            <strong>เป้าหมายของเกม</strong>
+            <p>เลื่อนจัดเรียงตัวเลข 1 ถึง 15 จากซ้ายไปขวา บนลงล่าง โดยให้ช่องว่างอยู่มุมขวาล่างสุด</p>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <span class="step-icon">👆</span>
+          <div class="step-content">
+            <strong>การเลื่อนบล็อก</strong>
+            <p>คลิกหรือแตะตัวเลขที่อยู่ติดช่องว่าง หรือกดตัวเลขแถวเดียวกันเพื่อดันเลื่อนทั้งแถวได้</p>
+          </div>
+        </div>
+      </div>
+
+      <button id="closeTutorialBtn" class="btn btn-shuffle" style="width: 100%;">
+        🚀 เข้าใจแล้ว เริ่มเล่นเลย!
+      </button>
+    </div>
+  </div>
+
   <!-- Win Modal -->
   <div id="winModal" class="modal">
     <div class="modal-box">
-      <div class="modal-trophy">🏆</div>
+      <div style="font-size: 48px; margin-bottom: 6px;">🏆</div>
       <h2 class="modal-title">สุดยอดมาก!</h2>
       <p class="modal-sub">คุณเรียงตัวเลข 1-15 สำเร็จแล้ว</p>
       <div class="modal-stats">
@@ -458,6 +802,336 @@
     const finalMovesEl = document.getElementById('finalMoves');
     const tileEls = new Map();
 
+    // -------------------------------------------------------------
+    // Cozy Ambient BGM Engine (สังเคราะห์สดด้วย Web Audio API)
+    // -------------------------------------------------------------
+    class CozyMusicEngine {
+      constructor() {
+        this.ctx = null;
+        this.isPlaying = false;
+        this.isMuted = false;
+        this.masterGain = null;
+        this.volume = 0.35;
+        this.noteTimer = null;
+        this.step = 0;
+
+        this.scale = [
+          { chord: [174.61, 220.00, 261.63, 329.63], melody: [349.23, 440.00, 523.25, 659.25] },
+          { chord: [196.00, 246.94, 293.66, 392.00], melody: [392.00, 493.88, 587.33, 783.99] },
+          { chord: [164.81, 196.00, 246.94, 329.63], melody: [329.63, 392.00, 493.88, 659.25] },
+          { chord: [220.00, 261.63, 329.63, 392.00], melody: [440.00, 523.25, 659.25, 880.00] }
+        ];
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) {
+            this.ctx = new AudioContext();
+            this.masterGain = this.ctx.createGain();
+            this.masterGain.gain.setValueAtTime(this.isMuted ? 0 : this.volume, this.ctx.currentTime);
+            this.masterGain.connect(this.ctx.destination);
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      playPluck(freq, duration = 0.5, gainMultiplier = 0.15) {
+        if (!this.ctx || this.isMuted) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const filter = this.ctx.createBiquadFilter();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now);
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(1400, now);
+        filter.frequency.exponentialRampToValueAtTime(300, now + duration);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(gainMultiplier, now + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.masterGain);
+
+        osc.start(now);
+        osc.stop(now + duration + 0.05);
+      }
+
+      tick() {
+        if (!this.isPlaying || this.isMuted) return;
+        const barIndex = Math.floor(this.step / 8) % this.scale.length;
+        const subStep = this.step % 8;
+        const currentBar = this.scale[barIndex];
+
+        if (subStep === 0) {
+          this.playPluck(currentBar.chord[0], 1.2, 0.08);
+          this.playPluck(currentBar.chord[1], 1.0, 0.05);
+        } else if (subStep === 4) {
+          this.playPluck(currentBar.chord[2], 0.9, 0.05);
+          this.playPluck(currentBar.chord[3], 0.9, 0.04);
+        }
+
+        if (subStep % 2 === 0 || Math.random() > 0.4) {
+          const melodyNote = currentBar.melody[Math.floor(Math.random() * currentBar.melody.length)];
+          this.playPluck(melodyNote, 0.6, 0.06);
+        }
+
+        this.step++;
+      }
+
+      start() {
+        this.init();
+        if (this.isPlaying) return;
+        this.isPlaying = true;
+        this.step = 0;
+        clearInterval(this.noteTimer);
+        this.noteTimer = setInterval(() => this.tick(), 380);
+      }
+
+      stop() {
+        this.isPlaying = false;
+        clearInterval(this.noteTimer);
+        this.noteTimer = null;
+      }
+
+      setVolume(val) {
+        this.volume = Math.max(0, Math.min(1, val));
+        if (this.masterGain && this.ctx && !this.isMuted) {
+          this.masterGain.gain.setValueAtTime(this.volume, this.ctx.currentTime);
+        }
+      }
+
+      toggleMute() {
+        this.isMuted = !this.isMuted;
+        if (this.masterGain && this.ctx) {
+          this.masterGain.gain.setValueAtTime(this.isMuted ? 0 : this.volume, this.ctx.currentTime);
+        }
+        if (!this.isMuted && !this.isPlaying) {
+          this.start();
+        }
+        return this.isMuted;
+      }
+
+      // เสียง "ต๊อก" แบบละมุนๆ สไตล์ไม้/แม่เหล็ก (ASMR Soft Clack)
+      playTok() {
+        if (this.isMuted) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+
+        const pitchVariation = 340 + (Math.random() * 30 - 15);
+
+        const oscBody = this.ctx.createOscillator();
+        const gainBody = this.ctx.createGain();
+        const filter = this.ctx.createBiquadFilter();
+
+        oscBody.type = 'sine';
+        oscBody.frequency.setValueAtTime(pitchVariation, now);
+        oscBody.frequency.exponentialRampToValueAtTime(140, now + 0.045);
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(1600, now);
+
+        gainBody.gain.setValueAtTime(0.001, now);
+        gainBody.gain.linearRampToValueAtTime(0.32, now + 0.003);
+        gainBody.gain.exponentialRampToValueAtTime(0.0001, now + 0.048);
+
+        oscBody.connect(filter);
+        filter.connect(gainBody);
+        gainBody.connect(this.masterGain);
+
+        oscBody.start(now);
+        oscBody.stop(now + 0.055);
+
+        const oscClick = this.ctx.createOscillator();
+        const gainClick = this.ctx.createGain();
+
+        oscClick.type = 'triangle';
+        oscClick.frequency.setValueAtTime(750, now);
+        oscClick.frequency.exponentialRampToValueAtTime(320, now + 0.015);
+
+        gainClick.gain.setValueAtTime(0.001, now);
+        gainClick.gain.linearRampToValueAtTime(0.14, now + 0.002);
+        gainClick.gain.exponentialRampToValueAtTime(0.0001, now + 0.018);
+
+        oscClick.connect(filter);
+        gainClick.connect(this.masterGain);
+
+        oscClick.start(now);
+        oscClick.stop(now + 0.022);
+      }
+    }
+
+    const bgm = new CozyMusicEngine();
+    const musicToggleBtn = document.getElementById('musicToggleBtn');
+    const volumeSlider = document.getElementById('volumeSlider');
+
+    musicToggleBtn.addEventListener('click', () => {
+      bgm.init();
+      if (!bgm.isPlaying) {
+        bgm.start();
+        musicToggleBtn.textContent = '🎵';
+        musicToggleBtn.title = 'ปิดเพลง (Mute)';
+      } else {
+        const isMuted = bgm.toggleMute();
+        musicToggleBtn.textContent = isMuted ? '🔇' : '🎵';
+        musicToggleBtn.title = isMuted ? 'เปิดเพลง (Unmute)' : 'ปิดเพลง (Mute)';
+      }
+    });
+
+    volumeSlider.addEventListener('input', (e) => {
+      const vol = parseFloat(e.target.value) / 100;
+      bgm.setVolume(vol);
+      if (vol === 0) {
+        musicToggleBtn.textContent = '🔇';
+      } else if (!bgm.isMuted) {
+        musicToggleBtn.textContent = '🎵';
+      }
+    });
+
+    function autoStartMusic() {
+      if (!bgm.isPlaying && !bgm.isMuted) {
+        bgm.start();
+      }
+      window.removeEventListener('pointerdown', autoStartMusic);
+    }
+    window.addEventListener('pointerdown', autoStartMusic);
+
+    // -------------------------------------------------------------
+    // ระบบปรับแต่งสีธีม (Theme Color Customizer)
+    // -------------------------------------------------------------
+    const DEFAULT_BLOCK_COLOR = '#F27B48';
+    const DEFAULT_TEXT_COLOR = '#FFFFFF';
+
+    let currentBlockColor = localStorage.getItem('puzzle_block_color') || DEFAULT_BLOCK_COLOR;
+    let currentTextColor = localStorage.getItem('puzzle_text_color') || DEFAULT_TEXT_COLOR;
+
+    const colorModal = document.getElementById('colorModal');
+    const colorModalBtn = document.getElementById('colorModalBtn');
+    const closeColorModalBtn = document.getElementById('closeColorModalBtn');
+    const resetColorBtn = document.getElementById('resetColorBtn');
+    const blockColorPicker = document.getElementById('blockColorPicker');
+    const textColorPicker = document.getElementById('textColorPicker');
+    const blockColorHex = document.getElementById('blockColorHex');
+    const textColorHex = document.getElementById('textColorHex');
+    const previewTileCard = document.getElementById('previewTileCard');
+    const previewNum = document.getElementById('previewNum');
+    const previewWord = document.getElementById('previewWord');
+
+    function hexToRgb(hex) {
+      let c = hex.replace('#', '');
+      if (c.length === 3) c = c.split('').map(x => x + x).join('');
+      const num = parseInt(c, 16);
+      return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
+    }
+
+    function adjustColorBrightness(hex, percent) {
+      const rgb = hexToRgb(hex);
+      const r = Math.min(255, Math.max(0, Math.round(rgb.r + (255 - rgb.r) * (percent / 100))));
+      const g = Math.min(255, Math.max(0, Math.round(rgb.g + (255 - rgb.g) * (percent / 100))));
+      const b = Math.min(255, Math.max(0, Math.round(rgb.b + (255 - rgb.b) * (percent / 100))));
+      return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+    }
+
+    function applyThemeColors(blockHex, textHex) {
+      currentBlockColor = blockHex;
+      currentTextColor = textHex;
+
+      const topHex = adjustColorBrightness(blockHex, 22);
+      const borderHex = adjustColorBrightness(blockHex, 14);
+      const rgb = hexToRgb(blockHex);
+      const shadow = `rgba(${Math.round(rgb.r * 0.7)}, ${Math.round(rgb.g * 0.7)}, ${Math.round(rgb.b * 0.7)}, 0.32)`;
+
+      // อัปเดต CSS Variables ของหน้าเว็บ
+      document.documentElement.style.setProperty('--tile-top', topHex);
+      document.documentElement.style.setProperty('--tile-bot', blockHex);
+      document.documentElement.style.setProperty('--tile-border', borderHex);
+      document.documentElement.style.setProperty('--tile-shadow', shadow);
+      document.documentElement.style.setProperty('--tile-text', textHex);
+      document.documentElement.style.setProperty('--tile-subtext', textHex + 'D9');
+
+      // อัปเดตการแสดงผลในหน้าต่างปรับสี
+      blockColorPicker.value = blockHex;
+      textColorPicker.value = textHex;
+      blockColorHex.textContent = blockHex.toUpperCase();
+      textColorHex.textContent = textHex.toUpperCase();
+
+      previewTileCard.style.background = `linear-gradient(145deg, ${topHex}, ${blockHex})`;
+      previewTileCard.style.borderColor = borderHex;
+      previewTileCard.style.boxShadow = `0 6px 14px ${shadow}`;
+      previewNum.style.color = textHex;
+      previewWord.style.color = textHex + 'D9';
+
+      localStorage.setItem('puzzle_block_color', blockHex);
+      localStorage.setItem('puzzle_text_color', textHex);
+    }
+
+    // Event listeners สำหรับ Color Modal
+    colorModalBtn.onclick = () => colorModal.classList.add('active');
+    closeColorModalBtn.onclick = () => colorModal.classList.remove('active');
+    colorModal.onclick = (e) => {
+      if (e.target === colorModal) colorModal.classList.remove('active');
+    };
+
+    blockColorPicker.addEventListener('input', (e) => {
+      applyThemeColors(e.target.value, currentTextColor);
+    });
+
+    textColorPicker.addEventListener('input', (e) => {
+      applyThemeColors(currentBlockColor, e.target.value);
+    });
+
+    // Swatches สำหรับสีบล็อก
+    document.querySelectorAll('.swatch-btn[data-color]').forEach(btn => {
+      btn.onclick = () => applyThemeColors(btn.dataset.color, currentTextColor);
+    });
+
+    // Swatches สำหรับสีตัวเลข
+    document.querySelectorAll('.swatch-text-btn[data-text-color]').forEach(btn => {
+      btn.onclick = () => applyThemeColors(currentBlockColor, btn.dataset.textColor);
+    });
+
+    // รีเซ็ตค่าเริ่มต้น
+    resetColorBtn.onclick = () => {
+      applyThemeColors(DEFAULT_BLOCK_COLOR, DEFAULT_TEXT_COLOR);
+    };
+
+    // โหลดสีที่เคยบันทึกไว้
+    applyThemeColors(currentBlockColor, currentTextColor);
+
+    // Tutorial Elements
+    const tutorialModal = document.getElementById('tutorialModal');
+    const closeTutorialBtn = document.getElementById('closeTutorialBtn');
+    const helpBtn = document.getElementById('helpBtn');
+
+    function openTutorial() {
+      tutorialModal.classList.add('active');
+    }
+
+    function closeTutorial() {
+      tutorialModal.classList.remove('active');
+      localStorage.setItem('puzzle_tutorial_seen', 'true');
+    }
+
+    closeTutorialBtn.onclick = closeTutorial;
+    helpBtn.onclick = openTutorial;
+    tutorialModal.onclick = (e) => {
+      if (e.target === tutorialModal) closeTutorial();
+    };
+
+    function checkFirstVisit() {
+      if (!localStorage.getItem('puzzle_tutorial_seen')) {
+        openTutorial();
+      }
+    }
+
     // ระบบสลับโหมด Dark / Light
     const themeToggle = document.getElementById('themeToggle');
     const switchIcon = document.getElementById('switchIcon');
@@ -476,7 +1150,7 @@
       setTheme(current === 'dark' ? 'light' : 'dark');
     });
 
-    // สร้าง DOM บล็อก 1-15 ครั้งเดียว
+    // สร้าง DOM บล็อก 1-15
     function createTiles() {
       tray.innerHTML = '';
       tileEls.clear();
@@ -497,7 +1171,6 @@
       }
     }
 
-    // อัปเดตตำแหน่ง CSS Transform
     function render() {
       for (let idx = 0; idx < TOTAL; idx++) {
         const num = board[idx];
@@ -508,7 +1181,6 @@
       }
     }
 
-    // เลื่อนตัวเลข (รองรับเลื่อนทั้งแถว/คอลัมน์)
     function moveTile(num) {
       if (isWon || isShuffling) return;
       const clickedIdx = board.indexOf(num);
@@ -516,13 +1188,13 @@
       const eRow = Math.floor(emptyIdx / SIZE), eCol = emptyIdx % SIZE;
 
       let moved = false;
-      if (cCol === eCol) { // แถวแนวตั้งเดียวกัน
+      if (cCol === eCol) {
         const step = cRow < eRow ? 1 : -1;
         for (let r = eRow; r !== cRow; r -= step) {
           board[r * SIZE + cCol] = board[(r - step) * SIZE + cCol];
         }
         moved = true;
-      } else if (cRow === eRow) { // แถวแนวนอนเดียวกัน
+      } else if (cRow === eRow) {
         const step = cCol < eCol ? 1 : -1;
         for (let c = eCol; c !== cCol; c -= step) {
           board[cRow * SIZE + c] = board[cRow * SIZE + (c - step)];
@@ -534,6 +1206,7 @@
         board[clickedIdx] = 0;
         emptyIdx = clickedIdx;
         render();
+        bgm.playTok();
         if (!isStarted) startTimer();
         moves++;
         movesEl.textContent = moves;
@@ -541,7 +1214,6 @@
       }
     }
 
-    // สุ่มกระดานแบบรับประกันว่าแก้ได้ 100% (Random Walk 180 ก้าว)
     function shuffle() {
       if (isShuffling) return;
       isShuffling = true;
@@ -619,18 +1291,6 @@
       timerId = null;
     }
 
-    // Keyboard support
-    window.addEventListener('keydown', (e) => {
-      if (isWon || isShuffling) return;
-      const r = Math.floor(emptyIdx / SIZE), c = emptyIdx % SIZE;
-      let target = -1;
-      if (e.code === 'ArrowUp' && r < SIZE - 1) target = (r + 1) * SIZE + c;
-      if (e.code === 'ArrowDown' && r > 0) target = (r - 1) * SIZE + c;
-      if (e.code === 'ArrowLeft' && c < SIZE - 1) target = r * SIZE + (c + 1);
-      if (e.code === 'ArrowRight' && c > 0) target = r * SIZE + (c - 1);
-      if (target !== -1) moveTile(board[target]);
-    });
-
     // Event listeners
     document.getElementById('shuffleBtn').onclick = () => shuffle();
     document.getElementById('playAgainBtn').onclick = () => shuffle();
@@ -638,6 +1298,7 @@
     // Start
     createTiles();
     shuffle();
+    checkFirstVisit();
   </script>
 </body>
 </html>
