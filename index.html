@@ -3,10 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Sliding Block Puzzle (4x4)</title>
+  <title>Sliding Block Puzzle (4x4) - Server Leaderboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Firebase SDK (Compat) สำหรับเซิร์ฟเวอร์กระดานอันดับ Realtime -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
   <style>
     :root {
       --bg-grad: radial-gradient(circle at 50% 15%, #FFFDF9 0%, #FAF5EE 100%);
@@ -48,19 +53,20 @@
     .deli-pill { background: #E83A30; color: white; font-family: 'Fredoka', cursive; font-size: 15px; font-weight: 700; padding: 3px 9px; border-radius: 12px; box-shadow: 0 3px 6px rgba(232,58,48,0.25); }
     .deli-pill span { background: #0FB5BA; font-size: 10px; padding: 2px 6px; border-radius: 8px; }
     .brand-title { font-size: 14px; font-weight: 700; color: var(--muted); letter-spacing: 0.5px; }
-    .header-actions { display: flex; align-items: center; gap: 6px; }
+    .header-actions { display: flex; align-items: center; gap: 5px; }
 
     /* Widgets & Buttons */
-    .music-box { display: flex; align-items: center; background: var(--card); border: 2px solid var(--card-border); border-radius: 20px; padding: 2px 6px 2px 3px; gap: 6px; }
-    .icon-btn { background: none; border: none; color: var(--text); width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; }
-    .vol-slider { -webkit-appearance: none; appearance: none; width: 48px; height: 4px; border-radius: 4px; background: var(--track); outline: none; cursor: pointer; }
+    .music-box { display: flex; align-items: center; background: var(--card); border: 2px solid var(--card-border); border-radius: 20px; padding: 2px 6px 2px 3px; gap: 5px; }
+    .icon-btn { background: none; border: none; color: var(--text); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; }
+    .vol-slider { -webkit-appearance: none; appearance: none; width: 42px; height: 4px; border-radius: 4px; background: var(--track); outline: none; cursor: pointer; }
     .vol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--tile-bot); cursor: pointer; }
     .vol-slider::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: var(--tile-bot); cursor: pointer; border: none; }
     .btn-circle { background: var(--card); border: 2px solid var(--card-border); color: var(--text); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; }
-    .theme-switch { background: #EAE1D1; border: 2px solid #DACAB3; border-radius: 20px; width: 48px; height: 28px; cursor: pointer; position: relative; display: flex; align-items: center; padding: 2px; }
+    .btn-circle:active { transform: scale(0.92); }
+    .theme-switch { background: #EAE1D1; border: 2px solid #DACAB3; border-radius: 20px; width: 46px; height: 28px; cursor: pointer; position: relative; display: flex; align-items: center; padding: 2px; }
     .switch-handle { width: 20px; height: 20px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; transition: transform 0.25s; font-size: 11px; }
     [data-theme="dark"] .theme-switch { background: #383229; border-color: #4F4537; }
-    [data-theme="dark"] .switch-handle { transform: translateX(20px); background: var(--tile-top); }
+    [data-theme="dark"] .switch-handle { transform: translateX(18px); background: var(--tile-top); }
 
     /* HUD & Chassis */
     .hud { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -87,12 +93,12 @@
     /* Modals */
     .modal { position: fixed; inset: 0; background: rgba(15,10,5,0.65); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.25s; z-index: 100; }
     .modal.active { opacity: 1; pointer-events: auto; }
-    .modal-box { background: var(--card); border: 4px solid var(--border); border-radius: 26px; padding: 24px 20px; width: 100%; max-width: 340px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+    .modal-box { background: var(--card); border: 4px solid var(--border); border-radius: 26px; padding: 22px 18px; width: 100%; max-width: 340px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
     .modal-title { font-family: 'Fredoka', cursive; font-size: 24px; margin-bottom: 2px; }
-    .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+    .modal-sub { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
     .step-card { display: flex; gap: 10px; background: var(--tray); padding: 10px 12px; border-radius: 14px; text-align: left; margin-bottom: 10px; }
-    .preview-card { width: 72px; height: 72px; border-radius: 16px; margin: 0 auto 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px solid var(--tile-border); background: linear-gradient(145deg, var(--tile-top), var(--tile-bot)); box-shadow: 0 6px 14px var(--tile-shadow); }
-    .color-section { text-align: left; margin-bottom: 14px; }
+    .preview-card { width: 68px; height: 68px; border-radius: 16px; margin: 0 auto 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px solid var(--tile-border); background: linear-gradient(145deg, var(--tile-top), var(--tile-bot)); box-shadow: 0 6px 14px var(--tile-shadow); }
+    .color-section { text-align: left; margin-bottom: 12px; }
     .color-header { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
     .color-row { display: flex; align-items: center; gap: 8px; }
     .color-pick-wrap { width: 38px; height: 34px; border-radius: 10px; border: 2px solid var(--card-border); overflow: hidden; position: relative; flex-shrink: 0; cursor: pointer; }
@@ -101,8 +107,25 @@
     .swatch { width: 24px; height: 24px; border-radius: 50%; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.1s; }
     .swatch:hover { transform: scale(1.15); }
     .btn-reset-color { background: none; border: none; color: var(--muted); font-size: 11px; font-weight: 600; cursor: pointer; text-decoration: underline; margin-top: 6px; }
-    .modal-stats { background: var(--tray); border-radius: 14px; padding: 10px; display: flex; justify-content: space-around; margin-bottom: 18px; }
+    .modal-stats { background: var(--tray); border-radius: 14px; padding: 10px; display: flex; justify-content: space-around; margin-bottom: 14px; }
     .stat-val { font-family: 'Fredoka', sans-serif; font-size: 17px; font-weight: 700; color: var(--tile-bot); }
+
+    /* ---------------- Leaderboard & Profile Styles ---------------- */
+    .lb-header-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; background: rgba(15,181,186,0.15); color: #0FB5BA; padding: 2px 7px; border-radius: 10px; margin-bottom: 8px; }
+    .lb-list { display: flex; flex-direction: column; gap: 6px; max-height: 250px; overflow-y: auto; margin-bottom: 12px; padding-right: 2px; }
+    .lb-item { display: flex; justify-content: space-between; align-items: center; background: var(--tray); padding: 7px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+    .lb-item.is-me { border: 2px solid var(--tile-bot); background: var(--card); }
+    .lb-left { display: flex; align-items: center; gap: 7px; min-width: 0; }
+    .lb-rank { font-family: 'Fredoka', sans-serif; font-weight: 700; width: 20px; text-align: center; }
+    .lb-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 105px; text-align: left; }
+    .lb-stats { text-align: right; flex-shrink: 0; }
+    .lb-time { font-family: 'Fredoka', sans-serif; font-size: 13px; color: var(--tile-bot); }
+    .lb-moves { font-size: 9.5px; color: var(--muted); }
+    .profile-bar { display: flex; align-items: center; justify-content: space-between; background: var(--card); border: 2px solid var(--card-border); border-radius: 12px; padding: 6px 10px; margin-bottom: 10px; cursor: pointer; font-size: 12px; font-weight: 600; }
+    .avatar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 10px 0; }
+    .av-btn { font-size: 20px; padding: 5px; border-radius: 10px; border: 2px solid transparent; background: var(--tray); cursor: pointer; }
+    .av-btn.selected { border-color: var(--tile-bot); background: var(--card); }
+    .name-input { width: 100%; padding: 8px 12px; border-radius: 12px; border: 2px solid var(--card-border); background: var(--tray); font-family: 'Prompt', sans-serif; font-size: 14px; text-align: center; outline: none; margin-bottom: 12px; color: var(--text); }
   </style>
 </head>
 <body>
@@ -115,12 +138,18 @@
         <span class="brand-title">SLIDING PUZZLE</span>
       </div>
       <div class="header-actions">
+        <!-- BGM Widget -->
         <div class="music-box">
           <button id="musicToggleBtn" class="icon-btn" title="เปิด/ปิดเพลง">🎵</button>
           <input type="range" id="volSlider" min="0" max="100" value="35" class="vol-slider" title="ระดับเสียง">
         </div>
+        <!-- ปุ่มเปิดกระดานอันดับเซิร์ฟเวอร์ -->
+        <button id="lbBtn" class="btn-circle" title="ตารางอันดับทั้งเซิร์ฟเวอร์">🏆</button>
+        <!-- ปุ่มปรับแต่งสี -->
         <button id="colorModalBtn" class="btn-circle" title="ปรับแต่งสี">🎨</button>
+        <!-- ปุ่มวิธีเล่น -->
         <button id="helpBtn" class="btn-circle" title="วิธีเล่น">❓</button>
+        <!-- ปุ่มโหมดมืด/สว่าง -->
         <button id="themeToggle" class="theme-switch" title="สลับโหมด Dark/Light">
           <div class="switch-handle"><span id="switchIcon">☀️</span></div>
         </button>
@@ -146,6 +175,39 @@
     <footer>
       <button id="shuffleBtn" class="btn-shuffle">🎲 สุ่มกระดานใหม่</button>
     </footer>
+  </div>
+
+  <!-- LEADERBOARD MODAL (หน้าต่างตารางอันดับ) -->
+  <div id="lbModal" class="modal">
+    <div class="modal-box">
+      <div class="lb-header-tag">🟢 LIVE REALTIME</div>
+      <h2 class="modal-title">🏆 อันดับทั้งเซิร์ฟเวอร์</h2>
+      <p class="modal-sub">สุดยอดผู้เล่นที่ทำสถิติได้เร็วที่สุด</p>
+      
+      <!-- Top 10 List -->
+      <div id="lbList" class="lb-list"></div>
+
+      <!-- แถบโปรไฟล์ผู้เล่นด้านล่าง -->
+      <div id="openProfileFromLb" class="profile-bar" title="คลิกเพื่อเปลี่ยนชื่อหรือรูปโปรไฟล์">
+        <span id="lbMyProfileText">🦊 ผู้เล่นนิรนาม</span>
+        <span style="color: var(--tile-bot); font-size: 11px;">✏️ แก้ไขชื่อ</span>
+      </div>
+
+      <button id="closeLbBtn" class="btn-shuffle">🎮 กลับไปเล่นต่อ</button>
+    </div>
+  </div>
+
+  <!-- PROFILE EDIT MODAL (หน้าต่างตั้งชื่อผู้เล่น) -->
+  <div id="profileModal" class="modal">
+    <div class="modal-box">
+      <h2 id="profileTitle" class="modal-title">👤 โปรไฟล์ของคุณ</h2>
+      <p id="profileSub" class="modal-sub">เลือกรูปอวาตาร์และพิมพ์ชื่อเล่นสำหรับขึ้นตารางอันดับ</p>
+      
+      <div class="avatar-grid" id="avatarGrid"></div>
+      <input type="text" id="playerNameInput" class="name-input" maxlength="12" placeholder="ใส่ชื่อเล่นของคุณ...">
+      
+      <button id="saveProfileBtn" class="btn-shuffle">💾 บันทึกโปรไฟล์</button>
+    </div>
   </div>
 
   <!-- Color Customizer Modal -->
@@ -197,14 +259,23 @@
   <!-- Win Modal -->
   <div id="winModal" class="modal">
     <div class="modal-box">
-      <div style="font-size: 48px; margin-bottom: 6px;">🏆</div>
+      <div style="font-size: 46px; margin-bottom: 4px;">🏆</div>
       <h2 class="modal-title">สุดยอดมาก!</h2>
       <p class="modal-sub">คุณเรียงตัวเลข 1-15 สำเร็จแล้ว</p>
+      
       <div class="modal-stats">
         <div><div class="hud-label">เวลาที่ใช้</div><div id="finalTime" class="stat-val">00:00</div></div>
         <div><div class="hud-label">จำนวนก้าว</div><div id="finalMoves" class="stat-val">0</div></div>
       </div>
-      <button id="playAgainBtn" class="btn-shuffle">🎮 เล่นอีกรอบ</button>
+
+      <div id="winRankMessage" style="font-size: 13px; font-weight: 700; color: var(--tile-bot); margin-bottom: 14px;">
+        กำลังจัดอันดับเซิร์ฟเวอร์...
+      </div>
+
+      <div style="display: flex; gap: 8px;">
+        <button id="viewLbFromWinBtn" class="btn-shuffle" style="flex: 1; background: var(--card); color: var(--text); border: 2px solid var(--card-border);">🏆 ส่องอันดับ</button>
+        <button id="playAgainBtn" class="btn-shuffle" style="flex: 1;">🎮 เล่นอีกรอบ</button>
+      </div>
     </div>
   </div>
 
@@ -212,11 +283,211 @@
     const WORDS = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen'];
     const BLOCK_COLORS = ['#F27B48','#EF4444','#F43F5E','#EC4899','#8B5CF6','#6366F1','#2563EB','#06B6D4','#10B981','#84CC16','#F59E0B','#374151'];
     const TEXT_COLORS = ['#FFFFFF','#18181B','#FEF08A','#451A03','#064E3B'];
+    const AVATARS = ['🦊', '🐱', '🐼', '🦁', '🤖', '👑', '⚡', '🚀', '⭐', '🐯', '🦄', '🐲'];
     const SIZE = 4, TOTAL = 16;
+
+    // --- Firebase Database Configuration ---
+    // เชื่อมต่อคะแนนผู้เล่นข้ามโลกแบบ Realtime ด้วย Google Firebase Realtime Database
+    const FIREBASE_CONFIG = {
+      databaseURL: "https://my-puzzle-1c882-default-rtdb.firebaseio.com"
+    };
+
+    let rtdb = null;
+    if (FIREBASE_CONFIG.databaseURL) {
+      try {
+        firebase.initializeApp(FIREBASE_CONFIG);
+        rtdb = firebase.database();
+      } catch (err) {
+        console.warn("Firebase Init:", err);
+      }
+    }
 
     let board = [], emptyIdx = 15, moves = 0, seconds = 0, timerId = null, isStarted = false, isWon = false, isShuffling = false;
     const tray = document.getElementById('tray'), timeEl = document.getElementById('timeDisplay'), movesEl = document.getElementById('movesDisplay');
     const tileEls = new Map(), modal = (id, open) => document.getElementById(id).classList.toggle('active', open);
+
+    // --- Player Profile State (จำข้อมูลผู้เล่นในเบราว์เซอร์) ---
+    let player = {
+      id: localStorage.getItem('puzzle_pid') || ('p_' + Math.random().toString(36).substr(2, 9)),
+      name: localStorage.getItem('puzzle_pname') || 'ผู้เล่นนิรนาม',
+      avatar: localStorage.getItem('puzzle_pavatar') || '🦊'
+    };
+    localStorage.setItem('puzzle_pid', player.id);
+
+    let isInitialSetup = false;
+
+    function updateProfileUI() {
+      document.getElementById('lbMyProfileText').textContent = `${player.avatar} ${player.name}`;
+      document.getElementById('playerNameInput').value = player.name;
+    }
+
+    function openProfileSetup(isFirst = false) {
+      isInitialSetup = isFirst;
+      document.getElementById('profileTitle').textContent = isFirst ? '👋 ยินดีต้อนรับสู่เกม!' : '👤 โปรไฟล์ของคุณ';
+      document.getElementById('profileSub').textContent = isFirst ? 'เลือกรูปอวาตาร์และพิมพ์ชื่อเล่นของคุณก่อนเริ่มเล่น' : 'เลือกรูปอวาตาร์และพิมพ์ชื่อเล่นสำหรับขึ้นตารางอันดับ';
+      document.getElementById('saveProfileBtn').textContent = isFirst ? 'ถัดไป: อ่านวิธีเล่น ➡️' : '💾 บันทึกโปรไฟล์';
+      modal('profileModal', true);
+    }
+
+    // สร้าง Grid เลือก Avatar
+    const avGrid = document.getElementById('avatarGrid');
+    AVATARS.forEach(av => {
+      const b = document.createElement('button');
+      b.className = `av-btn ${av === player.avatar ? 'selected' : ''}`;
+      b.textContent = av;
+      b.onclick = () => {
+        document.querySelectorAll('.av-btn').forEach(el => el.classList.remove('selected'));
+        b.classList.add('selected');
+        player.avatar = av;
+      };
+      avGrid.appendChild(b);
+    });
+
+    document.getElementById('saveProfileBtn').onclick = () => {
+      const val = document.getElementById('playerNameInput').value.trim();
+      if (val) player.name = val;
+      localStorage.setItem('puzzle_pname', player.name);
+      localStorage.setItem('puzzle_pavatar', player.avatar);
+      localStorage.setItem('puzzle_pname_set', '1');
+      updateProfileUI();
+      modal('profileModal', false);
+
+      if (isInitialSetup) {
+        isInitialSetup = false;
+        // ครั้งแรก: ไปหน้าต่างคู่มือวิธีเล่นต่อทันที
+        modal('tutorialModal', true);
+      } else {
+        // อัปเดตข้อมูลขึ้นเซิร์ฟเวอร์
+        if (localStorage.getItem('puzzle_best_time')) {
+          submitScore(parseInt(localStorage.getItem('puzzle_best_time')), parseInt(localStorage.getItem('puzzle_best_moves')));
+        } else {
+          renderLeaderboard(getCachedLeaderboard());
+        }
+      }
+    };
+
+    document.getElementById('openProfileFromLb').onclick = () => openProfileSetup(false);
+    document.getElementById('profileModal').onclick = e => { 
+      if (e.target.id === 'profileModal') {
+        if (isInitialSetup) {
+          document.getElementById('saveProfileBtn').click();
+        } else {
+          modal('profileModal', false);
+        }
+      } 
+    };
+
+    // --- Leaderboard System (ไม่มีบอท) ---
+    const MOCK_SCORES = [];
+
+    function getCachedLeaderboard() {
+      try {
+        const local = localStorage.getItem('puzzle_leaderboard_cache');
+        if (local) {
+          const parsed = JSON.parse(local);
+          // ล้างแคชบอทเก่าทิ้ง
+          if (parsed.some(x => x.name === 'สปีดรันเนอร์')) {
+            localStorage.removeItem('puzzle_leaderboard_cache');
+            return [];
+          }
+          return parsed;
+        }
+        return [];
+      } catch (e) { return []; }
+    }
+
+    function renderLeaderboard(list) {
+      const container = document.getElementById('lbList');
+      container.innerHTML = '';
+
+      if (!list || list.length === 0) {
+        container.innerHTML = `
+          <div style="padding: 24px 10px; color: var(--muted); font-size: 13px; text-align: center;">
+            🏆 ยังไม่มีสถิติในตาราง<br>
+            <span style="font-size: 11px; opacity: 0.85;">มาเป็นคนแรกที่เล่นจบเพื่อขึ้นอันดับ 1 กันเลย!</span>
+          </div>`;
+        return;
+      }
+
+      list.sort((a, b) => a.time - b.time || a.moves - b.moves);
+      list.slice(0, 10).forEach((item, idx) => {
+        const rank = idx + 1;
+        const isMe = item.id === player.id || item.name === player.name;
+        let medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}`;
+        
+        const row = document.createElement('div');
+        row.className = `lb-item ${isMe ? 'is-me' : ''}`;
+        row.innerHTML = `
+          <div class="lb-left">
+            <span class="lb-rank">${medal}</span>
+            <span>${item.avatar || '🦊'}</span>
+            <span class="lb-name">${item.name} ${isMe ? '<small style="color:var(--tile-bot)">(คุณ)</small>' : ''}</span>
+          </div>
+          <div class="lb-stats">
+            <div class="lb-time">${String(Math.floor(item.time/60)).padStart(2,'0')}:${String(item.time%60).padStart(2,'0')}</div>
+            <div class="lb-moves">${item.moves} ก้าว</div>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+      localStorage.setItem('puzzle_leaderboard_cache', JSON.stringify(list));
+    }
+
+    function submitScore(timeSec, moveCount) {
+      // บันทึกสถิติส่วนตัวที่ดีที่สุด
+      const best = localStorage.getItem('puzzle_best_time');
+      if (!best || timeSec < parseInt(best)) {
+        localStorage.setItem('puzzle_best_time', timeSec);
+        localStorage.setItem('puzzle_best_moves', moveCount);
+      }
+
+      const entry = {
+        id: player.id,
+        name: player.name,
+        avatar: player.avatar,
+        time: timeSec,
+        moves: moveCount,
+        updatedAt: Date.now()
+      };
+
+      if (rtdb) {
+        // บันทึกขึ้น Firebase Realtime Database
+        rtdb.ref('leaderboard/' + player.id).transaction(current => {
+          if (!current || timeSec < current.time || (timeSec === current.time && moveCount < current.moves)) {
+            return entry;
+          }
+          return current;
+        });
+      } else {
+        // โหมดจำลองบันทึกในเครื่อง
+        const list = getCachedLeaderboard();
+        const existingIdx = list.findIndex(x => x.id === player.id);
+        if (existingIdx !== -1) {
+          if (timeSec < list[existingIdx].time) list[existingIdx] = entry;
+        } else {
+          list.push(entry);
+        }
+        renderLeaderboard(list);
+      }
+    }
+
+    // เชื่อมต่อการดึงอันดับแบบ Realtime จาก Firebase
+    if (rtdb) {
+      rtdb.ref('leaderboard').limitToLast(40).on('value', snap => {
+        const val = snap.val();
+        if (val) {
+          const list = Object.values(val);
+          renderLeaderboard(list);
+        }
+      });
+    } else {
+      renderLeaderboard(getCachedLeaderboard());
+    }
+
+    document.getElementById('lbBtn').onclick = () => modal('lbModal', true);
+    document.getElementById('closeLbBtn').onclick = () => modal('lbModal', false);
+    document.getElementById('lbModal').onclick = e => { if (e.target.id === 'lbModal') modal('lbModal', false); };
+    document.getElementById('viewLbFromWinBtn').onclick = () => { modal('winModal', false); modal('lbModal', true); };
 
     // Audio Engine (BGM + ASMR Soft Tok)
     class SoundEngine {
@@ -402,6 +673,23 @@
           isWon = true; clearInterval(timerId);
           document.getElementById('finalTime').textContent = timeEl.textContent;
           document.getElementById('finalMoves').textContent = moves;
+          
+          // ส่งคะแนนจัดอันดับเซิร์ฟเวอร์
+          submitScore(seconds, moves);
+          
+          // ตรวจสอบอันดับของผู้เล่น
+          const currentList = getCachedLeaderboard();
+          currentList.sort((a,b) => a.time - b.time || a.moves - b.moves);
+          const myRank = currentList.findIndex(x => x.id === player.id) + 1;
+          const rankMsg = document.getElementById('winRankMessage');
+          if (myRank > 0 && myRank <= 10) {
+            rankMsg.textContent = `🎉 สุดยอด! คุณติดอันดับที่ ${myRank} ของเซิร์ฟเวอร์`;
+          } else if (myRank > 10) {
+            rankMsg.textContent = `👏 สถิติยอดเยี่ยม! คุณอยู่อันดับที่ ${myRank}`;
+          } else {
+            rankMsg.textContent = `🚀 บันทึกสถิติของคุณเรียบร้อยแล้ว!`;
+          }
+
           setTimeout(() => modal('winModal', true), 300);
         }
       }
@@ -428,12 +716,18 @@
     }
 
     // Init App
+    updateProfileUI();
     switchTheme(localStorage.getItem('puzzle_theme') || 'light');
     applyColors(localStorage.getItem('puzzle_block_color') || '#F27B48', localStorage.getItem('puzzle_text_color') || '#FFFFFF');
     document.getElementById('shuffleBtn').onclick = () => shuffle();
     document.getElementById('playAgainBtn').onclick = () => shuffle();
     createTiles(); shuffle();
-    if (!localStorage.getItem('puzzle_tutorial_seen')) modal('tutorialModal', true);
+    // เช็กผู้เล่นใหม่: ให้ตั้งชื่อก่อน -> จากนั้นเปิดคู่มือวิธีเล่นให้อ่าน
+    if (!localStorage.getItem('puzzle_pname_set')) {
+      openProfileSetup(true);
+    } else if (!localStorage.getItem('puzzle_tutorial_seen')) {
+      modal('tutorialModal', true);
+    }
   </script>
 </body>
 </html>
